@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861722410778",
+    "project_id": "gymbro-4d570",
+    "storage_bucket": "gymbro-4d570.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861722410778:android:3967351b2e48c0e62ab6a3",
+        "android_client_info": {
+          "package_name": "com.example.gymapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBKcDeX0-wEyyXJ6J2l6djchOW1SPPjRM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

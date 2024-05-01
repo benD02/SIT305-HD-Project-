@@ -13,15 +13,29 @@
         android:theme="@style/Theme.GymApp"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.Entry.SetupActivity"
+            android:exported="false"
+            android:label="@string/title_activity_setup"
+            android:theme="@style/Theme.GymApp.NoActionBar" />
+        <activity
+            android:name=".ui.Entry.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.Entry.EntryActivity"
             android:exported="true"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:label="@string/title_activity_entry">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"
+        android:label="@string/app_name">
+        <!-- Removed the intent-filter from MainActivity -->
+    </activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
+</application>
 
-</manifest>
+    </manifest>
