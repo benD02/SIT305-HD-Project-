@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="goals_array">
+        <item>Increase Muscle Mass</item>
+        <item>Cut/shred</item>
+        <item>Cardio</item>
+        <item>Weight Loss</item>
+        <item>Build Core Strength</item>
+        <item>Build Upper Body</item>
+        <item>Build Lower Body</item>
+        <item>Improved Agility</item>
+        <item>Work Legs</item>
+        <item>Work Arms</item>
+        <item>Work Chest</item>
+        <item>Work Back</item>
+        <item>Work Shoulders</item>
+        <item>Work Abdominals</item>
+        <item>Trim Waistline</item>
+
+    </string-array>
+
+</resources>

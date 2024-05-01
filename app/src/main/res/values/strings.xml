@@ -9,6 +9,7 @@
     <string name="username">Username</string>
     <string name="create_account">Create Account</string>
     <string name="email">Email</string>
+    <string name="age">age</string>
     <string name="sign_up">Sign Up</string>
     <string name="gymbro">GymBro</string>
     <string name="achieve_your_fitness_goals">Achieve your fitness goals!</string>

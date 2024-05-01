@@ -10,13 +10,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.example.gymapp.R;
 import com.example.gymapp.databinding.ActivitySetupBinding;
 
+import java.util.ArrayList;
+
 public class SetupActivity extends AppCompatActivity {
 
     private ActivitySetupBinding binding;
+
+    private ListView listViewGoals;
+
+    private ArrayList<String> selectedGoals = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,18 +34,14 @@ public class SetupActivity extends AppCompatActivity {
         binding = ActivitySetupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Toolbar toolbar = binding.toolbar;
-        setSupportActionBar(toolbar);
-        CollapsingToolbarLayout toolBarLayout = binding.toolbarLayout;
-        toolBarLayout.setTitle(getTitle());
 
-        FloatingActionButton fab = binding.fab;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+        listViewGoals = findViewById(R.id.listViewGoals);
+        String[] goals = getResources().getStringArray(R.array.goals_array);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_multiple_choice, goals);
+        listViewGoals.setAdapter(adapter);
+
+
     }
 }
