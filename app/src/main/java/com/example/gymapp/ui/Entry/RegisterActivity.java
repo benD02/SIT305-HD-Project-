@@ -2,6 +2,7 @@ package com.example.gymapp.ui.Entry;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -13,47 +14,47 @@ import android.content.Intent;
 import com.example.gymapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText emailEditText;
     private EditText passwordEditText;
+    private EditText usernameEditText;
     private EditText confirmEditText;
     private Button signupButton;
     private TextView loginTextView;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;  // Firestore instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance(); // Initialize Firestore
 
-        // Initialize UI components
+        usernameEditText = findViewById(R.id.signup_username_input);
         emailEditText = findViewById(R.id.signup_email_input);
         passwordEditText = findViewById(R.id.signup_password_input);
         confirmEditText = findViewById(R.id.signup_password_confirm_input);
         signupButton = findViewById(R.id.signup_btn);
         loginTextView = findViewById(R.id.loginButton);
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerUser();
-            }
-        });
-
-        loginTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(RegisterActivity.this, EntryActivity.class));
-                finish();
-            }
+        signupButton.setOnClickListener(v -> registerUser());
+        loginTextView.setOnClickListener(v -> {
+            startActivity(new Intent(RegisterActivity.this, EntryActivity.class));
+            finish();
         });
     }
 
     private void registerUser() {
+        String username = usernameEditText.getText().toString().trim();
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
         String confirmPassword = confirmEditText.getText().toString().trim();
@@ -71,13 +72,27 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Toast.makeText(RegisterActivity.this, "Registration successful.",
-                                Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(RegisterActivity.this, SetupActivity.class));
-                        finish();
+                        // User registration success
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("username", username);
+                        userData.put("email", email);
+
+                        // Add a new document with the user's UID
+                        db.collection("users").document(user.getUid())
+                                .set(userData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(RegisterActivity.this, "Registration successful and data stored.",
+                                            Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(RegisterActivity.this, SetupActivity.class));
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(RegisterActivity.this, "Error saving user data: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                });
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // Registration failed
                         Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }

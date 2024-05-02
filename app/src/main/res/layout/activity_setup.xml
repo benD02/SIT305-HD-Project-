@@ -20,14 +20,10 @@
             android:layout_height="139dp"
             android:src="@drawable/logo_gym" />
 
-
-
-
         <LinearLayout
         android:layout_marginBottom="50dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         android:orientation="vertical">
 
             <TextView
@@ -41,6 +37,7 @@
                 android:textSize="18sp" />
 
             <LinearLayout
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -48,41 +45,41 @@
                     <EditText
                         android:layout_marginRight="20dp"
                         android:id="@+id/edit_age"
-                        android:layout_width="100dp"
+                        android:inputType="number"
+                        android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corner"
                         android:hint="age"
-                        android:inputType="textEmailAddress"
-                        android:padding="18dp"
+                        android:padding="14dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="15sp" />
 
                     <EditText
                         android:layout_marginRight="20dp"
 
                         android:id="@+id/edit_weight"
-                        android:layout_width="100dp"
+                        android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corner"
-                        android:hint="Weight"
-                        android:inputType="textEmailAddress"
-                        android:padding="18dp"
+                        android:hint="Weight(kg)"
+                        android:inputType="numberDecimal"
+                        android:padding="14dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="15sp" />
 
                     <EditText
                         android:id="@+id/edit_height"
-                        android:layout_width="100dp"
+                        android:layout_width="110dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_corner"
-                        android:hint="Height"
-                        android:inputType="textEmailAddress"
-                        android:padding="18dp"
+                        android:hint="Height(cm)"
+                        android:inputType="numberDecimal"
+                        android:padding="14dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/black"
-                        android:textSize="20sp" />
+                        android:textSize="15sp" />
 
             </LinearLayout>
 
@@ -113,14 +110,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
-            android:hint="Duration in weeks"
-            android:inputType="textEmailAddress"
+            android:hint="Duration (Weeks)"
+            android:inputType="number"
             android:padding="18dp"
             android:textColor="@color/black"
             android:layout_marginBottom="15dp"
-
             android:textColorHint="@color/black"
-            android:textSize="20sp" />
+            android:textSize="15sp" />
+
         <EditText
             android:id="@+id/edit_days"
             android:layout_width="wrap_content"
@@ -131,7 +128,7 @@
             android:padding="18dp"
             android:textColor="@color/black"
             android:textColorHint="@color/black"
-            android:textSize="20sp" />
+            android:textSize="15sp" />
 
     </LinearLayout>
 
@@ -141,8 +138,7 @@
             android:layout_height="match_parent"
             android:padding="16dp"
             android:orientation="vertical"
-            android:layout_marginBottom="50dp"
-            >
+            android:layout_marginBottom="50dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -160,16 +156,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-
                 android:choiceMode="multipleChoice"
                 android:textColor="@color/white" />
-
-
-
         </LinearLayout>
 
 
-
+        <Button
+            android:id="@+id/confirm_button"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm Details" />
 
 
     </LinearLayout>
