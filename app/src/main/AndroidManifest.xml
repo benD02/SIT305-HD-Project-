@@ -13,6 +13,16 @@
         android:theme="@style/Theme.GymApp"
         tools:targetApi="31">
         <activity
+            android:name=".ui.Workout.WorkoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.Profile.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.PlanCreator.ui.CreatorActivity"
+            android:exported="false"
+            android:label="@string/title_activity_creator" />
+        <activity
             android:name=".ui.Entry.SetupActivity"
             android:exported="false"
             android:label="@string/title_activity_setup"
@@ -24,18 +34,20 @@
             android:name=".ui.Entry.EntryActivity"
             android:exported="true"
             android:label="@string/title_activity_entry">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-    <activity
-        android:name=".MainActivity"
-        android:exported="true"
-        android:label="@string/app_name">
-        <!-- Removed the intent-filter from MainActivity -->
-    </activity>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-</application>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    </manifest>
+    </application>
+
+</manifest>

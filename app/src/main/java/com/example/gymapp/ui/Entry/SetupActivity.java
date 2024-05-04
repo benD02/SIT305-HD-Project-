@@ -1,5 +1,6 @@
 package com.example.gymapp.ui.Entry;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.PlanCreator.ui.CreatorActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -102,7 +104,13 @@ public class SetupActivity extends AppCompatActivity {
 
             db.collection("users").document(user.getUid()).collection("details")
                     .add(userMap)
-                    .addOnSuccessListener(documentReference -> Toast.makeText(SetupActivity.this, "Details Saved Successfully", Toast.LENGTH_SHORT).show())
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(SetupActivity.this, "Details Saved Successfully", Toast.LENGTH_SHORT).show();
+                        // Start the CreatorActivity
+                        Intent intent = new Intent(SetupActivity.this, CreatorActivity.class);
+                        startActivity(intent);
+                        finish(); // Optionally finish SetupActivity if you don't want it in the back stack
+                    })
                     .addOnFailureListener(e -> Toast.makeText(SetupActivity.this, "Failed to Save Details: " + e.getMessage(), Toast.LENGTH_LONG).show());
         } else {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_LONG).show();

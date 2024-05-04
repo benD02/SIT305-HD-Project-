@@ -10,8 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 import com.google.firebase.FirebaseApp;
-
-import com.example.gymapp.MainActivity;
+import com.example.gymapp.ui.MainActivity;
 import com.example.gymapp.R;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -64,7 +63,7 @@ public class EntryActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Toast.makeText(EntryActivity.this, "Authentication successful.",
                                     Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(EntryActivity.this, MainActivity.class));
+                            startActivity(new Intent(EntryActivity.this, com.example.gymapp.ui.MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(EntryActivity.this, "Authentication failed: " + task.getException().getMessage(),
