@@ -20,8 +20,13 @@
             android:exported="false" />
         <activity
             android:name=".ui.PlanCreator.ui.CreatorActivity"
-            android:exported="false"
-            android:label="@string/title_activity_creator" />
+            android:exported="true"
+            android:label="@string/title_activity_creator"  >
+            <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+    </activity>
         <activity
             android:name=".ui.Entry.SetupActivity"
             android:exported="false"
@@ -34,11 +39,7 @@
             android:name=".ui.Entry.EntryActivity"
             android:exported="true"
             android:label="@string/title_activity_entry">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".ui.MainActivity"
             android:exported="true">

@@ -1,27 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
-    android:orientation="vertical">
+    android:background="@drawable/white_background"
+    android:orientation="vertical"
+    android:gravity="center">
 
-    <FrameLayout
-        android:id="@+id/container"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/gradient_background"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        tools:context="CreatorActivity">
+        <LinearLayout
+            android:id="@+id/layout_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav_menu"
-        android:layout_width="match_parent"
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:src="@drawable/logo_gym" />
+
+            <TextView
+                android:id="@+id/create_account_msg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create your plan here! select your chosen exercises for each day."
+                android:textColor="@color/black"
+                android:padding="8dp"
+                android:textSize="22sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_create"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:addStatesFromChildren="false"
-        android:background="@drawable/black_background"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_margin="@dimen/fab_margin"
+        app:fabSize="normal"
+        app:layout_anchor="@id/scrollView"
+        app:layout_anchorGravity="bottom|end|right"
+        app:maxImageSize="36dp"
+        app:srcCompat="@drawable/baseline_auto_awesome_24" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/create_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="660dp"
+        android:layout_marginLeft="22dp"
+        android:backgroundTint="#1B6AE1"
+        android:padding="8dp"
+        android:text="Create Plan"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

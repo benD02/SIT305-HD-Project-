@@ -1,37 +1,161 @@
 package com.example.gymapp.ui.PlanCreator.ui;
 
 import android.os.Bundle;
-
-import com.example.gymapp.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.example.gymapp.databinding.ActivityCreatorBinding;
+import com.example.gymapp.R;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class CreatorActivity extends AppCompatActivity {
 
-    private ActivityCreatorBinding binding;
+    private LinearLayout layoutContainer;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityCreatorBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        BottomNavigationView navView = binding.bottomNavMenu; // Correctly reference the BottomNavigationView
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.bottom_nav_menu);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(navView, navController);
-
+        setContentView(R.layout.activity_creator);  // Ensure you have this layout defined
+        layoutContainer = findViewById(R.id.layout_container);
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        loadWorkoutDays();
     }
+
+    private void loadWorkoutDays() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            String uid = user.getUid();
+            db.collection("users").document(uid).collection("details")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            if (documentSnapshot.exists()) {
+                                String daysStr = documentSnapshot.getString("days");
+                                if (daysStr != null) {
+                                    try {
+                                        int days = Integer.parseInt(daysStr);
+                                        for (int i = 1; i <= days; i++) {
+                                            addDayInput(i);
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        Log.e("CreatorActivity", "Error parsing 'days' as an integer: " + e.getMessage(), e);
+                                    }
+                                } else {
+                                    Log.e("CreatorActivity", "'days' field is null in document " + documentSnapshot.getId());
+                                }
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("CreatorActivity", "Error loading documents: " + e.getMessage(), e);
+                    });
+        } else {
+            Log.e("CreatorActivity", "User is not logged in.");
+        }
+    }
+
+
+
+
+
+    private void addDayInput(int day) {
+        TextView dayLabel = new TextView(this);
+        dayLabel.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        dayLabel.setText("Day " + day);
+        dayLabel.setTextSize(48);
+        dayLabel.setPadding(0, 0, 0, 10); // Add bottom padding or margin to separate days
+        layoutContainer.addView(dayLabel);
+
+        // Create a container for exercises
+        LinearLayout exercisesContainer = new LinearLayout(this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 10, 0, 10); // Set margins around the exercises container
+        exercisesContainer.setLayoutParams(layoutParams);
+        exercisesContainer.setOrientation(LinearLayout.VERTICAL);
+        layoutContainer.addView(exercisesContainer);
+
+        // Add button to add exercises, with a limit of adding up to 10 exercises
+        Button addExerciseButton = new Button(new ContextThemeWrapper(this, R.style.CustomButtonStyle));
+        addExerciseButton.setText("Add Exercise");
+        addExerciseButton.setOnClickListener(v -> {
+            if (exercisesContainer.getChildCount() < 10 * 2) { // Each exercise adds two children (Spinner and EditText)
+                addExerciseInput(exercisesContainer);
+            } else {
+                Toast.makeText(this, "Maximum of 10 exercises reached", Toast.LENGTH_SHORT).show();
+            }
+        });
+        LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonLayoutParams.setMargins(0, 0, 0, 120); // Add bottom margin to the button
+        addExerciseButton.setLayoutParams(buttonLayoutParams);
+
+        layoutContainer.addView(addExerciseButton);
+
+        // Initial exercise input
+        addExerciseInput(exercisesContainer);
+    }
+
+    private void addExerciseInput(LinearLayout container) {
+        // Spinner for selecting exercises
+        Spinner exerciseSpinner = new Spinner(this);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.exercise_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        exerciseSpinner.setAdapter(adapter);
+        container.addView(exerciseSpinner);
+
+        // Horizontal layout for exercise details
+        LinearLayout detailsContainer = new LinearLayout(this);
+        detailsContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        detailsContainer.setOrientation(LinearLayout.HORIZONTAL);
+
+        // Create TextInputEditText for number of reps
+        TextInputEditText repsEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
+        repsEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        repsEditText.setHint("Reps");
+        detailsContainer.addView(repsEditText);
+
+        // Create TextInputEditText for number of sets
+        TextInputEditText setsEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
+        setsEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        setsEditText.setHint("Sets");
+        detailsContainer.addView(setsEditText);
+
+        // Create TextInputEditText for weight
+        TextInputEditText weightEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
+        weightEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        weightEditText.setHint("Weight");
+        detailsContainer.addView(weightEditText);
+
+        // Create TextInputEditText for time
+        TextInputEditText timeEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
+        timeEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        timeEditText.setHint("Time");
+        detailsContainer.addView(timeEditText);
+
+        // Adding the horizontal layout to the main container
+        container.addView(detailsContainer);
+    }
+
+
+
+
 
 }
