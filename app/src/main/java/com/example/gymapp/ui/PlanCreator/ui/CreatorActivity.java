@@ -3,6 +3,7 @@ package com.example.gymapp.ui.PlanCreator.ui;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -11,8 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gymapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,6 +26,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class CreatorActivity extends AppCompatActivity {
 
     private LinearLayout layoutContainer;
+    private DrawerLayout drawerLayout;
+
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -32,7 +38,22 @@ public class CreatorActivity extends AppCompatActivity {
         layoutContainer = findViewById(R.id.layout_container);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        FloatingActionButton fab = findViewById(R.id.fab_ai);
+        fab.setOnClickListener(view -> toggleDrawer());
+
+
+
         loadWorkoutDays();
+    }
+
+    private void toggleDrawer() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void loadWorkoutDays() {
