@@ -112,46 +112,49 @@ public class CreatorActivity extends AppCompatActivity {
     }
 
     private void addExerciseInput(LinearLayout container) {
+        // Container for a single exercise entry
+        LinearLayout exerciseEntry = new LinearLayout(this);
+        exerciseEntry.setOrientation(LinearLayout.VERTICAL);
+        container.addView(exerciseEntry);
+
         // Spinner for selecting exercises
         Spinner exerciseSpinner = new Spinner(this);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.exercise_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         exerciseSpinner.setAdapter(adapter);
-        container.addView(exerciseSpinner);
+        exerciseEntry.addView(exerciseSpinner);
 
         // Horizontal layout for exercise details
         LinearLayout detailsContainer = new LinearLayout(this);
         detailsContainer.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         detailsContainer.setOrientation(LinearLayout.HORIZONTAL);
+        exerciseEntry.addView(detailsContainer);
 
-        // Create TextInputEditText for number of reps
-        TextInputEditText repsEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
-        repsEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        repsEditText.setHint("Reps");
-        detailsContainer.addView(repsEditText);
+        // Details input fields
+        addDetailInput(detailsContainer, "Reps");
+        addDetailInput(detailsContainer, "Sets");
+        addDetailInput(detailsContainer, "Weight");
+        addDetailInput(detailsContainer, "Time");
 
-        // Create TextInputEditText for number of sets
-        TextInputEditText setsEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
-        setsEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        setsEditText.setHint("Sets");
-        detailsContainer.addView(setsEditText);
+        // Button to remove the exercise entry
+        Button deleteButton = new Button(new ContextThemeWrapper(this, R.style.CustomDelButtonStyle));
+        deleteButton.setText("Delete Exercise");
+        deleteButton.setOnClickListener(v -> {
+            // Remove the entire exercise entry from the container
+            container.removeView(exerciseEntry);
+        });
 
-        // Create TextInputEditText for weight
-        TextInputEditText weightEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
-        weightEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        weightEditText.setHint("Weight");
-        detailsContainer.addView(weightEditText);
+        // Add delete button below the details
+        exerciseEntry.addView(deleteButton);
+    }
 
-        // Create TextInputEditText for time
-        TextInputEditText timeEditText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
-        timeEditText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        timeEditText.setHint("Time");
-        detailsContainer.addView(timeEditText);
-
-        // Adding the horizontal layout to the main container
-        container.addView(detailsContainer);
+    private void addDetailInput(LinearLayout container, String hint) {
+        TextInputEditText editText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
+        editText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        editText.setHint(hint);
+        container.addView(editText);
     }
 
 

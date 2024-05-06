@@ -40,7 +40,7 @@
     </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_create"
+        android:id="@+id/fab_ai"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
