@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -16,20 +17,52 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.ExerciseClasses.Day;
+import com.example.gymapp.ui.ExerciseClasses.Exercise;
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CreatorActivity extends AppCompatActivity {
 
     private LinearLayout layoutContainer;
     private DrawerLayout drawerLayout;
+    private TextView responseText;
+    private Button createPlanButton;
+
+    private List<Day> workoutDays = new ArrayList<>();
+
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+
+    String daysStr;
+    String age;
+    String duration;
+    List<String> goals;
+    String height;
+    String weight;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +71,67 @@ public class CreatorActivity extends AppCompatActivity {
         layoutContainer = findViewById(R.id.layout_container);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        createPlanButton = findViewById(R.id.create_btn);
+        createPlanButton.setOnClickListener(v -> saveRoutineToFirestore());
+
+        responseText  = findViewById(R.id.tv_response);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         FloatingActionButton fab = findViewById(R.id.fab_ai);
         fab.setOnClickListener(view -> toggleDrawer());
 
-
-
         loadWorkoutDays();
+        generativeAi(daysStr, age, duration, goals, height, weight );
     }
+
+    private void saveRoutineToFirestore() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "User is not logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (workoutDays.isEmpty()) {
+            Toast.makeText(this, "No workout days to save.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Reference to the user's workout plans collection
+        CollectionReference workoutPlans = db.collection("users")
+                .document(user.getUid())
+                .collection("workoutPlans");
+
+        // Iterate over each day and save each as a separate document
+        for (Day day : workoutDays) {
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("Day", day.dayLabel);
+            List<Map<String, Object>> exercisesData = new ArrayList<>();
+
+            for (Exercise exercise : day.exercises) {
+                Map<String, Object> exerciseData = new HashMap<>();
+                exerciseData.put("Exercise Name", exercise.name);
+                exerciseData.put("Reps", exercise.reps);
+                exerciseData.put("Sets", exercise.sets);
+                exerciseData.put("Weight", exercise.weight);
+                exerciseData.put("Time", exercise.time);
+                exercisesData.add(exerciseData);
+            }
+
+            dayData.put("Exercises", exercisesData);
+
+            // Add the day data as a new document in the collection
+            workoutPlans.add(dayData)
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(CreatorActivity.this, "Workout plan for " + day.dayLabel + " saved successfully!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(CreatorActivity.this, "Error saving workout plan for " + day.dayLabel + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
+
+
 
     private void toggleDrawer() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -65,7 +150,18 @@ public class CreatorActivity extends AppCompatActivity {
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             if (documentSnapshot.exists()) {
-                                String daysStr = documentSnapshot.getString("days");
+                                 daysStr = documentSnapshot.getString("days");
+                                 age = documentSnapshot.getString("age");
+                                 duration = documentSnapshot.getString("duration");
+                                 goals = (List<String>) documentSnapshot.get("goals");
+                                 height = documentSnapshot.getString("height");
+                                 weight = documentSnapshot.getString("weight");
+
+                                Log.d("CreatorActivity", "Age: " + age);
+                                Log.d("CreatorActivity", "Duration: " + duration);
+                                Log.d("CreatorActivity", "Height: " + height);
+                                Log.d("CreatorActivity", "Weight: " + weight);
+                                Log.d("CreatorActivity", "Goals: " + goals);
                                 if (daysStr != null) {
                                     try {
                                         int days = Integer.parseInt(daysStr);
@@ -78,37 +174,84 @@ public class CreatorActivity extends AppCompatActivity {
                                 } else {
                                     Log.e("CreatorActivity", "'days' field is null in document " + documentSnapshot.getId());
                                 }
+
                             }
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("CreatorActivity", "Error loading documents: " + e.getMessage(), e);
                     });
+
         } else {
             Log.e("CreatorActivity", "User is not logged in.");
         }
+
+
+    }
+
+    private void generativeAi(String daysStr, String age, String duration, List goals, String height, String weight ){
+        GenerativeModel gm = new  GenerativeModel(/* modelName */ "gemini-pro",/* apiKey */  "AIzaSyDJxlEt0SvOaoocUIcorL-sDxaFjUXNU60");
+        GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+        Content content = new Content.Builder()
+                .addText( "Make a single week repeatable Gym routine accounting for the following variables:" + duration +  "weeks, covering the following goals:" + goals + "frequency: "
+                        + daysStr + "times/week, " + "age: "+ age + "body weight:" + weight + "kg, height:" + height +  " cm,")
+                .build();
+
+        Log.d("CreatorActivity", content.toString());
+
+
+        ExecutorService executor  = Executors.newSingleThreadExecutor();
+
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+        Log.d("CreatorActivity", response.toString());
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                String resultText = result.getText();
+                runOnUiThread(() -> {
+                    responseText.setText(resultText);
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Error generating content", Toast.LENGTH_SHORT).show();
+                });
+                t.printStackTrace();
+            }
+        }, executor);
+
+
+
+
     }
 
 
 
-
-
+    // Updated addDayInput method
     private void addDayInput(int day) {
+        // Create a new Day instance
+        Day currentDay = new Day("Day " + day);
+        workoutDays.add(currentDay);
+
         TextView dayLabel = new TextView(this);
         dayLabel.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        dayLabel.setText("Day " + day);
+        dayLabel.setText(currentDay.dayLabel);
         dayLabel.setTextSize(48);
-        dayLabel.setPadding(0, 0, 0, 10); // Add bottom padding or margin to separate days
+        dayLabel.setPadding(0, 0, 0, 10); // Add bottom padding/margin to separate days
         layoutContainer.addView(dayLabel);
 
         // Create a container for exercises
         LinearLayout exercisesContainer = new LinearLayout(this);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0, 10, 0, 10); // Set margins around the exercises container
+        layoutParams.setMargins(0, 10, 0, 10); // Add margins around the exercises container
         exercisesContainer.setLayoutParams(layoutParams);
         exercisesContainer.setOrientation(LinearLayout.VERTICAL);
+        exercisesContainer.setTag(currentDay); // Associate the day object with this layout
         layoutContainer.addView(exercisesContainer);
 
         // Add button to add exercises, with a limit of adding up to 10 exercises
@@ -121,18 +264,21 @@ public class CreatorActivity extends AppCompatActivity {
                 Toast.makeText(this, "Maximum of 10 exercises reached", Toast.LENGTH_SHORT).show();
             }
         });
+
         LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonLayoutParams.setMargins(0, 0, 0, 120); // Add bottom margin to the button
         addExerciseButton.setLayoutParams(buttonLayoutParams);
-
         layoutContainer.addView(addExerciseButton);
 
         // Initial exercise input
         addExerciseInput(exercisesContainer);
     }
 
+    // Updated addExerciseInput method
     private void addExerciseInput(LinearLayout container) {
+        Day currentDay = (Day) container.getTag();
+
         // Container for a single exercise entry
         LinearLayout exerciseEntry = new LinearLayout(this);
         exerciseEntry.setOrientation(LinearLayout.VERTICAL);
@@ -153,29 +299,40 @@ public class CreatorActivity extends AppCompatActivity {
         detailsContainer.setOrientation(LinearLayout.HORIZONTAL);
         exerciseEntry.addView(detailsContainer);
 
-        // Details input fields
-        addDetailInput(detailsContainer, "Reps");
-        addDetailInput(detailsContainer, "Sets");
-        addDetailInput(detailsContainer, "Weight");
-        addDetailInput(detailsContainer, "Time");
+        // Create input fields for exercise details
+        TextInputEditText repsInput = addDetailInput(detailsContainer, "Reps");
+        TextInputEditText setsInput = addDetailInput(detailsContainer, "Sets");
+        TextInputEditText weightInput = addDetailInput(detailsContainer, "Weight");
+        TextInputEditText timeInput = addDetailInput(detailsContainer, "Time");
+
+        // Create and store a new exercise
+        Exercise newExercise = new Exercise(
+                exerciseSpinner.getSelectedItem().toString(),
+                repsInput.getText().toString(),
+                setsInput.getText().toString(),
+                weightInput.getText().toString(),
+                timeInput.getText().toString()
+        );
+        currentDay.addExercise(newExercise);
 
         // Button to remove the exercise entry
         Button deleteButton = new Button(new ContextThemeWrapper(this, R.style.CustomDelButtonStyle));
         deleteButton.setText("Delete Exercise");
         deleteButton.setOnClickListener(v -> {
-            // Remove the entire exercise entry from the container
             container.removeView(exerciseEntry);
+            currentDay.exercises.remove(newExercise); // Remove the corresponding exercise from the list
         });
 
         // Add delete button below the details
         exerciseEntry.addView(deleteButton);
     }
 
-    private void addDetailInput(LinearLayout container, String hint) {
+    private TextInputEditText addDetailInput(LinearLayout container, String hint) {
         TextInputEditText editText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
         editText.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
         editText.setHint(hint);
         container.addView(editText);
+        return editText; // Return the created input field
     }
 
 

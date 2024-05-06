@@ -45,6 +45,20 @@ android {
 
 
 dependencies {
+    implementation("com.google.guava:guava:31.0.1-android")
+
+    // To use CallbackToFutureAdapter
+    implementation("androidx.concurrent:concurrent-futures:1.1.0")
+
+    // Kotlin
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.6.0")
+
+    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
+    // Required for one-shot operations (to use `ListenableFuture` from Guava Android)
+    implementation("com.google.guava:guava:31.0.1-android")
+
+    // Required for streaming operations (to use `Publisher` from Reactive Streams)
+    implementation("org.reactivestreams:reactive-streams:1.0.4")
 
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.ai.client.generativeai:generativeai:0.2.1")
