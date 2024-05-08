@@ -12,11 +12,13 @@ import android.widget.Toast;
 import android.content.Intent;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.Profile.User;
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,13 +80,20 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("username", username);
                         userData.put("email", email);
 
+                        //We need to save the UID locally so it can be properly referneced
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+
                         // Add a new document with the user's UID
                         db.collection("users").document(user.getUid())
                                 .set(userData)
                                 .addOnSuccessListener(aVoid -> {
+                                    //Stored the user instance inside  of the on success listener so it doesnt make the instnace if the  firestore is save is unsuccessful
+                                    User activeUser = new User(firebaseUser.getUid(), username, email, -1, -1, -1, -1, -1, new ArrayList<>());
                                     Toast.makeText(RegisterActivity.this, "Registration successful and data stored.",
                                             Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(RegisterActivity.this, SetupActivity.class));
+                                    Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
+                                    setupIntent.putExtra("user", activeUser);
+                                    startActivity(setupIntent);
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {

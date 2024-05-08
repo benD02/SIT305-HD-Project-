@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.gymapp.R;
 import com.example.gymapp.ui.PlanCreator.ui.CreatorActivity;
+import com.example.gymapp.ui.Profile.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,6 +27,7 @@ public class SetupActivity extends AppCompatActivity {
     private ListView listViewGoals;
     private Button confirmButton;
 
+    private User activeUser;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -36,6 +38,9 @@ public class SetupActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        activeUser = getIntent().getParcelableExtra("user");
+
 
         // Initialize UI components
         editAge = findViewById(R.id.edit_age);
@@ -105,13 +110,32 @@ public class SetupActivity extends AppCompatActivity {
             db.collection("users").document(user.getUid()).collection("details")
                     .add(userMap)
                     .addOnSuccessListener(documentReference -> {
+
+                        try {
+                            activeUser.setAge(Integer.parseInt(editAge.getText().toString().trim()));
+                            activeUser.setWeight(Double.parseDouble(editWeight.getText().toString().trim()));
+                            activeUser.setHeight(Double.parseDouble(editHeight.getText().toString().trim()));
+                            activeUser.setDaysPerWeek(Integer.parseInt(editDays.getText().toString().trim()));
+                            activeUser.setDurationInWeeks(Integer.parseInt(editDuration.getText().toString().trim()));
+                            activeUser.setGoals(getSelectedGoals());
+
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(this, "Invalid input format", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         Toast.makeText(SetupActivity.this, "Details Saved Successfully", Toast.LENGTH_SHORT).show();
                         // Start the CreatorActivity
                         Intent intent = new Intent(SetupActivity.this, CreatorActivity.class);
+                        intent.putExtra("user", activeUser);
                         startActivity(intent);
                         finish(); // Optionally finish SetupActivity if you don't want it in the back stack
                     })
                     .addOnFailureListener(e -> Toast.makeText(SetupActivity.this, "Failed to Save Details: " + e.getMessage(), Toast.LENGTH_LONG).show());
+
+
+
+
         } else {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_LONG).show();
         }

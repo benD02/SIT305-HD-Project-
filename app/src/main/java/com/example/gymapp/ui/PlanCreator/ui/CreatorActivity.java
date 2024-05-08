@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.gymapp.R;
 import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.ExerciseClasses.Exercise;
+import com.example.gymapp.ui.Profile.User;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
@@ -49,6 +50,8 @@ public class CreatorActivity extends AppCompatActivity {
     private TextView responseText;
     private Button createPlanButton;
 
+    private User activeUser;
+
     private List<Day> workoutDays = new ArrayList<>();
 
 
@@ -73,6 +76,8 @@ public class CreatorActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         createPlanButton = findViewById(R.id.create_btn);
         createPlanButton.setOnClickListener(v -> saveRoutineToFirestore());
+
+        activeUser = getIntent().getParcelableExtra("user");
 
         responseText  = findViewById(R.id.tv_response);
 
