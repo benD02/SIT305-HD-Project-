@@ -76,11 +76,10 @@ public class CreatorActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         createPlanButton = findViewById(R.id.create_btn);
         createPlanButton.setOnClickListener(v -> saveRoutineToFirestore());
-
         activeUser = getIntent().getParcelableExtra("user");
 
-        responseText  = findViewById(R.id.tv_response);
 
+        responseText  = findViewById(R.id.tv_response);
         drawerLayout = findViewById(R.id.drawer_layout);
         FloatingActionButton fab = findViewById(R.id.fab_ai);
         fab.setOnClickListener(view -> toggleDrawer());
@@ -101,43 +100,43 @@ public class CreatorActivity extends AppCompatActivity {
             return;
         }
 
-        // Reference to the user's workout plans collection
         CollectionReference workoutPlans = db.collection("users")
                 .document(user.getUid())
                 .collection("workoutPlans");
 
-        // Iterate over each day and save each as a separate document
         for (Day day : workoutDays) {
             Map<String, Object> dayData = new HashMap<>();
             dayData.put("Day", day.dayLabel);
             List<Map<String, Object>> exercisesData = new ArrayList<>();
 
-            for (Exercise exercise : day.exercises) {
-                Map<String, Object> exerciseData = new HashMap<>();
-                exerciseData.put("Exercise Name", exercise.name);
-                exerciseData.put("Reps", exercise.reps);
-                exerciseData.put("Sets", exercise.sets);
-                exerciseData.put("Weight", exercise.weight);
-                exerciseData.put("Time", exercise.time);
-                exercisesData.add(exerciseData);
+            LinearLayout exercisesContainer = (LinearLayout) layoutContainer.findViewWithTag(day);
+            for (int i = 0; i < exercisesContainer.getChildCount(); i++) {
+                View view = exercisesContainer.getChildAt(i);
+                if (view instanceof LinearLayout) {
+                    LinearLayout entry = (LinearLayout) view;
+                    Spinner exerciseSpinner = (Spinner) entry.getChildAt(0);
+                    TextInputEditText[] inputs = (TextInputEditText[]) exerciseSpinner.getTag();
+
+                    Map<String, Object> exerciseData = new HashMap<>();
+                    exerciseData.put("Exercise Name", exerciseSpinner.getSelectedItem().toString());
+                    exerciseData.put("Reps", inputs[0].getText().toString());
+                    exerciseData.put("Sets", inputs[1].getText().toString());
+                    exerciseData.put("Weight", inputs[2].getText().toString());
+                    exerciseData.put("Time", inputs[3].getText().toString());
+                    exercisesData.add(exerciseData);
+                }
             }
 
             dayData.put("Exercises", exercisesData);
-
-            // Add the day data as a new document in the collection
             workoutPlans.add(dayData)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(CreatorActivity.this, "Workout plan for " + day.dayLabel + " saved successfully!", Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(CreatorActivity.this, "Error saving workout plan for " + day.dayLabel + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreatorActivity.this, "Failed to save workout plan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
     }
-
-
-
-
     private void toggleDrawer() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -284,12 +283,10 @@ public class CreatorActivity extends AppCompatActivity {
     private void addExerciseInput(LinearLayout container) {
         Day currentDay = (Day) container.getTag();
 
-        // Container for a single exercise entry
         LinearLayout exerciseEntry = new LinearLayout(this);
         exerciseEntry.setOrientation(LinearLayout.VERTICAL);
         container.addView(exerciseEntry);
 
-        // Spinner for selecting exercises
         Spinner exerciseSpinner = new Spinner(this);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.exercise_options, android.R.layout.simple_spinner_item);
@@ -297,40 +294,21 @@ public class CreatorActivity extends AppCompatActivity {
         exerciseSpinner.setAdapter(adapter);
         exerciseEntry.addView(exerciseSpinner);
 
-        // Horizontal layout for exercise details
         LinearLayout detailsContainer = new LinearLayout(this);
         detailsContainer.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         detailsContainer.setOrientation(LinearLayout.HORIZONTAL);
         exerciseEntry.addView(detailsContainer);
 
-        // Create input fields for exercise details
-        TextInputEditText repsInput = addDetailInput(detailsContainer, "Reps");
-        TextInputEditText setsInput = addDetailInput(detailsContainer, "Sets");
-        TextInputEditText weightInput = addDetailInput(detailsContainer, "Weight");
-        TextInputEditText timeInput = addDetailInput(detailsContainer, "Time");
-
-        // Create and store a new exercise
-        Exercise newExercise = new Exercise(
-                exerciseSpinner.getSelectedItem().toString(),
-                repsInput.getText().toString(),
-                setsInput.getText().toString(),
-                weightInput.getText().toString(),
-                timeInput.getText().toString()
-        );
-        currentDay.addExercise(newExercise);
-
-        // Button to remove the exercise entry
-        Button deleteButton = new Button(new ContextThemeWrapper(this, R.style.CustomDelButtonStyle));
-        deleteButton.setText("Delete Exercise");
-        deleteButton.setOnClickListener(v -> {
-            container.removeView(exerciseEntry);
-            currentDay.exercises.remove(newExercise); // Remove the corresponding exercise from the list
+        // Adding detail inputs and associating them with the spinner via tag to fetch them later
+        exerciseSpinner.setTag(new TextInputEditText[]{
+                addDetailInput(detailsContainer, "Reps"),
+                addDetailInput(detailsContainer, "Sets"),
+                addDetailInput(detailsContainer, "Weight"),
+                addDetailInput(detailsContainer, "Time")
         });
-
-        // Add delete button below the details
-        exerciseEntry.addView(deleteButton);
     }
+
 
     private TextInputEditText addDetailInput(LinearLayout container, String hint) {
         TextInputEditText editText = new TextInputEditText(new ContextThemeWrapper(this, R.style.CustomEditTextStyle));
