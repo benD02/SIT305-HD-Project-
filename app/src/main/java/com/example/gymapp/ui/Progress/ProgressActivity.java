@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.AppData.AppData;
 import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.Profile.ProfileActivity;
 import com.example.gymapp.ui.Profile.User;
@@ -23,7 +25,11 @@ public class ProgressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
 
+        activeUser = AppData.getInstance().getActiveUser();
+        workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
 
+        Log.d("loadData", activeUser.toString());
+        Log.d("loadData", workoutPlan.toString());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_progress);
