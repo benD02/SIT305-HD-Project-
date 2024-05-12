@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 .set(userData)
                                 .addOnSuccessListener(aVoid -> {
                                     //Stored the user instance inside  of the on success listener so it doesnt make the instnace if the  firestore is save is unsuccessful
-                                    User activeUser = new User(firebaseUser.getUid(), username, email, -1, -1, -1, -1, -1, new ArrayList<>());
+                                    User activeUser = new User(firebaseUser.getUid(), username, email, null,-1, -1, -1, -1, -1, new ArrayList<>());
                                     Toast.makeText(RegisterActivity.this, "Registration successful and data stored.",
                                             Toast.LENGTH_SHORT).show();
                                     Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);

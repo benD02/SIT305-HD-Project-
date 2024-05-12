@@ -11,6 +11,8 @@ public class User implements Parcelable {
     private String uid;
     private String username;
     private String email;
+
+    private String level;
     private int age;
     private double weight;
     private double height;
@@ -22,10 +24,12 @@ public class User implements Parcelable {
         // Default constructor
     }
 
-    public User(String uid, String username, String email, int age, double weight, double height, int daysPerWeek, int durationInWeeks, ArrayList<String> goals) {
+    public User(String uid, String username, String email, String level, int age, double weight, double height, int daysPerWeek,
+                int durationInWeeks, ArrayList<String> goals) {
         this.uid = uid;
         this.username = username;
         this.email = email;
+        this.level = level;
         this.age = age;
         this.weight = weight;
         this.height = height;
@@ -38,6 +42,7 @@ public class User implements Parcelable {
         uid = in.readString();
         username = in.readString();
         email = in.readString();
+        level = in.readString();
         age = in.readInt();
         weight = in.readDouble();
         height = in.readDouble();
@@ -78,6 +83,10 @@ public class User implements Parcelable {
     public String getEmail() {
         return email;
     }
+    public String getLevel() {
+        return level;
+    }
+
 
     public void setEmail(String email) {
         this.email = email;
@@ -89,6 +98,10 @@ public class User implements Parcelable {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
     }
 
     public double getWeight() {
@@ -141,6 +154,7 @@ public class User implements Parcelable {
         dest.writeString(uid);
         dest.writeString(username);
         dest.writeString(email);
+        dest.writeString(level);
         dest.writeInt(age);
         dest.writeDouble(weight);
         dest.writeDouble(height);
@@ -148,4 +162,24 @@ public class User implements Parcelable {
         dest.writeInt(durationInWeeks);
         dest.writeStringList(goals);
     }
+
+
+
+    //added tostring function for debugging purposes
+    @Override
+    public String toString() {
+        return "User{" +
+                "uid='" + uid + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", level='" + level + '\'' +
+                ", age=" + age +
+                ", weight=" + weight +
+                ", height=" + height +
+                ", duration=" + daysPerWeek +
+                ", days=" + durationInWeeks +
+                ", goals=" + goals +
+                '}';
+    }
+
 }

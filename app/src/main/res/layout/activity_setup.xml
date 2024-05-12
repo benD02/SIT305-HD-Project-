@@ -29,7 +29,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Body Stats "
+                android:text="Stats "
                 android:textColor="@color/black"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="1dp"
@@ -37,7 +37,6 @@
                 android:textSize="18sp" />
 
             <LinearLayout
-                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -92,22 +91,34 @@
         android:layout_height="match_parent"
         android:padding="16dp"
         android:orientation="vertical"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="20dp"
         >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Plan Duration "
+            android:text="Plan Details "
             android:textColor="@color/black"
             android:paddingHorizontal="6dp"
             android:paddingVertical="1dp"
             android:layout_marginBottom="15dp"
             android:textSize="18sp" />
 
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Select plan duration"
+            android:textColor="@color/gray"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="1dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="14sp" />
+
         <EditText
             android:id="@+id/edit_duration"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
             android:hint="Duration (Weeks)"
@@ -118,17 +129,45 @@
             android:textColorHint="@color/black"
             android:textSize="15sp" />
 
-        <EditText
-            android:id="@+id/edit_days"
+        <TextView
             android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Days per week"
+            android:textColor="@color/gray"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="1dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/spinner_days"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
-            android:hint="how many days per week?"
-            android:inputType="textEmailAddress"
             android:padding="18dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/black"
-            android:textSize="15sp" />
+            android:layout_marginBottom="15dp"
+            android:popupBackground="@color/white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Difficulty"
+            android:textColor="@color/gray"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="1dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/spinner_level"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner"
+            android:padding="18dp"
+            android:layout_marginBottom="15dp"
+            android:popupBackground="@color/white"/>
+
+
 
     </LinearLayout>
 

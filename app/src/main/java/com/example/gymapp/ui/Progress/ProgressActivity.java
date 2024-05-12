@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.Profile.ProfileActivity;
 import com.example.gymapp.ui.Profile.User;
 import com.example.gymapp.ui.Workout.WorkoutActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+
 public class ProgressActivity extends AppCompatActivity {
     private User activeUser;
+    private ArrayList<Day> workoutPlan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,7 @@ public class ProgressActivity extends AppCompatActivity {
         setContentView(R.layout.activity_progress);
 
         activeUser = getIntent().getParcelableExtra("activeUser");
+        workoutPlan = getIntent().getParcelableArrayListExtra("workoutPlan");
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
@@ -30,6 +35,8 @@ public class ProgressActivity extends AppCompatActivity {
             if (id == R.id.navigation_profile) {
                 intent = new Intent(getApplicationContext(), ProfileActivity.class);
                 intent.putExtra("user", activeUser);
+                intent.putExtra("workoutPlan", new ArrayList(workoutPlan));
+
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();
@@ -37,6 +44,7 @@ public class ProgressActivity extends AppCompatActivity {
             } else if (id == R.id.navigation_workout) {
                 intent = new Intent(getApplicationContext(), WorkoutActivity.class);
                 intent.putExtra("user", activeUser);
+                intent.putExtra("workoutPlan", new ArrayList(workoutPlan));
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();

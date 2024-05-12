@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +24,9 @@ import java.util.Map;
 
 public class SetupActivity extends AppCompatActivity {
 
-    private EditText editAge, editWeight, editHeight, editDuration, editDays;
+    private EditText editAge, editWeight, editHeight, editDuration;
+
+    private Spinner editDays, editLevel;
     private ListView listViewGoals;
     private Button confirmButton;
 
@@ -47,9 +50,13 @@ public class SetupActivity extends AppCompatActivity {
         editWeight = findViewById(R.id.edit_weight);
         editHeight = findViewById(R.id.edit_height);
         editDuration = findViewById(R.id.edit_duration);
-        editDays = findViewById(R.id.edit_days);
+        editLevel = findViewById(R.id.spinner_level);
+        editDays = findViewById(R.id.spinner_days);
         listViewGoals = findViewById(R.id.listViewGoals);
         confirmButton = findViewById(R.id.confirm_button);
+
+        setUpSpinner(editDays, R.array.days_per_week_options);
+        setUpSpinner(editLevel, R.array.workout_level_options);
 
         // Setup ListView
         String[] goals = getResources().getStringArray(R.array.goals_array);
@@ -60,6 +67,12 @@ public class SetupActivity extends AppCompatActivity {
         // Confirm button click listener
         confirmButton.setOnClickListener(v -> saveUserDetails());
     }
+    private void setUpSpinner(Spinner spinner, int arrayResourceId) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                arrayResourceId, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
 
     private void saveUserDetails() {
         FirebaseUser user = mAuth.getCurrentUser();
@@ -69,7 +82,9 @@ public class SetupActivity extends AppCompatActivity {
             String weightStr = editWeight.getText().toString().trim();
             String heightStr = editHeight.getText().toString().trim();
             String durationStr = editDuration.getText().toString().trim();
-            String daysStr = editDays.getText().toString().trim();
+            String daysStr = editDays.getSelectedItem().toString().trim();
+            String levelStr = editLevel.getSelectedItem().toString().trim();
+
 
             int age = Integer.parseInt(ageStr.isEmpty() ? "-1" : ageStr);
             double weight = Double.parseDouble(weightStr.isEmpty() ? "-1" : weightStr);
@@ -104,7 +119,8 @@ public class SetupActivity extends AppCompatActivity {
             userMap.put("weight", editWeight.getText().toString().trim());
             userMap.put("height", editHeight.getText().toString().trim());
             userMap.put("duration", editDuration.getText().toString().trim());
-            userMap.put("days", editDays.getText().toString().trim());
+            userMap.put("days", editDays.getSelectedItem().toString().trim());
+            userMap.put("level", editLevel.getSelectedItem().toString().trim());
             userMap.put("goals", getSelectedGoals());
 
             db.collection("users").document(user.getUid()).collection("details")
@@ -115,8 +131,9 @@ public class SetupActivity extends AppCompatActivity {
                             activeUser.setAge(Integer.parseInt(editAge.getText().toString().trim()));
                             activeUser.setWeight(Double.parseDouble(editWeight.getText().toString().trim()));
                             activeUser.setHeight(Double.parseDouble(editHeight.getText().toString().trim()));
-                            activeUser.setDaysPerWeek(Integer.parseInt(editDays.getText().toString().trim()));
+                            activeUser.setDaysPerWeek(Integer.parseInt(editDays.getSelectedItem().toString().trim()));
                             activeUser.setDurationInWeeks(Integer.parseInt(editDuration.getText().toString().trim()));
+                            activeUser.setLevel(editDays.getSelectedItem().toString().trim());
                             activeUser.setGoals(getSelectedGoals());
 
                         } catch (NumberFormatException e) {

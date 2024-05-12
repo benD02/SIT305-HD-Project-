@@ -1,5 +1,6 @@
 package com.example.gymapp.ui.PlanCreator.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -11,15 +12,18 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.gymapp.ui.MainActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gymapp.R;
+import com.example.gymapp.ui.Entry.EntryActivity;
 import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.ExerciseClasses.Exercise;
 import com.example.gymapp.ui.Profile.User;
+import com.example.gymapp.ui.Workout.WorkoutActivity;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
@@ -52,7 +56,7 @@ public class CreatorActivity extends AppCompatActivity {
 
     private User activeUser;
 
-    private List<Day> workoutDays = new ArrayList<>();
+    private List<Day> workoutPlan = new ArrayList<>();
 
 
     private FirebaseFirestore db;
@@ -60,6 +64,8 @@ public class CreatorActivity extends AppCompatActivity {
 
     String daysStr;
     String age;
+
+    String level;
     String duration;
     List<String> goals;
     String height;
@@ -85,7 +91,7 @@ public class CreatorActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> toggleDrawer());
 
         loadWorkoutDays();
-        generativeAi(daysStr, age, duration, goals, height, weight );
+        generativeAi(daysStr, age, level, duration, goals, height, weight );
     }
 
     private void saveRoutineToFirestore() {
@@ -95,7 +101,7 @@ public class CreatorActivity extends AppCompatActivity {
             return;
         }
 
-        if (workoutDays.isEmpty()) {
+        if (workoutPlan.isEmpty()) {
             Toast.makeText(this, "No workout days to save.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -104,7 +110,7 @@ public class CreatorActivity extends AppCompatActivity {
                 .document(user.getUid())
                 .collection("workoutPlans");
 
-        for (Day day : workoutDays) {
+        for (Day day : workoutPlan) {
             Map<String, Object> dayData = new HashMap<>();
             dayData.put("Day", day.dayLabel);
             List<Map<String, Object>> exercisesData = new ArrayList<>();
@@ -131,6 +137,8 @@ public class CreatorActivity extends AppCompatActivity {
             workoutPlans.add(dayData)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(CreatorActivity.this, "Workout plan for " + day.dayLabel + " saved successfully!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(CreatorActivity.this, com.example.gymapp.ui.MainActivity.class));
+
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(CreatorActivity.this, "Failed to save workout plan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -193,13 +201,14 @@ public class CreatorActivity extends AppCompatActivity {
 
     }
 
-    private void generativeAi(String daysStr, String age, String duration, List goals, String height, String weight ){
+    private void generativeAi(String daysStr, String age, String level, String duration, List goals, String height, String weight ){
         GenerativeModel gm = new  GenerativeModel(/* modelName */ "gemini-pro",/* apiKey */  "AIzaSyDJxlEt0SvOaoocUIcorL-sDxaFjUXNU60");
         GenerativeModelFutures model = GenerativeModelFutures.from(gm);
 
         Content content = new Content.Builder()
-                .addText( "Make a single week repeatable Gym routine accounting for the following variables:" + duration +  "weeks, covering the following goals:" + goals + "frequency: "
-                        + daysStr + "times/week, " + "age: "+ age + "body weight:" + weight + "kg, height:" + height +  " cm,")
+                .addText( "Make a " + daysStr +  "day gym routine, for a " + age + "year old, " + level + "level, who is aged " + age +
+                        ", has a height of " + height + " and a weight of" + weight + "kg,  the routine should cover the following goals:"
+                        + goals)
                 .build();
 
         Log.d("CreatorActivity", content.toString());
@@ -238,7 +247,7 @@ public class CreatorActivity extends AppCompatActivity {
     private void addDayInput(int day) {
         // Create a new Day instance
         Day currentDay = new Day("Day " + day);
-        workoutDays.add(currentDay);
+        workoutPlan.add(currentDay);
 
         TextView dayLabel = new TextView(this);
         dayLabel.setLayoutParams(new LinearLayout.LayoutParams(
