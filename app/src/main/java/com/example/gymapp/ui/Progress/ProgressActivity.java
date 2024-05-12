@@ -23,8 +23,6 @@ public class ProgressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
 
-        activeUser = getIntent().getParcelableExtra("activeUser");
-        workoutPlan = getIntent().getParcelableArrayListExtra("workoutPlan");
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
@@ -34,17 +32,12 @@ public class ProgressActivity extends AppCompatActivity {
             Intent intent;
             if (id == R.id.navigation_profile) {
                 intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                intent.putExtra("user", activeUser);
-                intent.putExtra("workoutPlan", new ArrayList(workoutPlan));
-
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();
                 return true;
             } else if (id == R.id.navigation_workout) {
                 intent = new Intent(getApplicationContext(), WorkoutActivity.class);
-                intent.putExtra("user", activeUser);
-                intent.putExtra("workoutPlan", new ArrayList(workoutPlan));
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();

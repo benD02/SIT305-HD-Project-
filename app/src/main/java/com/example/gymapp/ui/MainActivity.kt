@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gymapp.R
+import com.example.gymapp.ui.AppData.AppData
 import com.example.gymapp.ui.ExerciseClasses.Day
 import com.example.gymapp.ui.ExerciseClasses.Exercise
 import com.example.gymapp.ui.Profile.ProfileActivity
@@ -28,15 +29,13 @@ class MainActivity : AppCompatActivity() {
                 activeUser = loadedUser
                 // Load workout data after user data is loaded
                 loadWorkoutData(uid) {
-                    // Proceed to ProfileActivity or wherever necessary after loading all data
-                    val intent = Intent(this, ProfileActivity::class.java).apply {
-                        putExtra("activeUser", activeUser)
-                        if (workoutPlan.isNotEmpty()) {
-                            putExtra("workoutPlan", ArrayList(workoutPlan))
-                        }
-                    }
+                    // Proceed to ProfileActivity o
+
+                    AppData.getInstance().activeUser = activeUser;
+                    AppData.getInstance().workoutPlan = workoutPlan;
+                    val intent = Intent(this, ProfileActivity::class.java)
                     startActivity(intent)
-                    finish()  // If you're moving to the new activity and don't want to return to this one
+                    finish()
                 }
             }
         } else {
@@ -52,11 +51,11 @@ class MainActivity : AppCompatActivity() {
                 val username = document.getString("username") ?: "N/A"
                 val email = document.getString("email") ?: "N/A"
 
-                // Fetch additional details from the 'details' sub-collection
+                // Fetch additional details from the details sub-collection
                 userDocRef.collection("details").get()
                     .addOnSuccessListener { querySnapshot ->
                         if (!querySnapshot.isEmpty) {
-                            // Assuming details are in the first document of the collection for simplicity
+                            //  details are in the first document of the collection for simplicity
                             val detailsDoc = querySnapshot.documents[0]
                             val level = detailsDoc.getString("level") ?: "Beginner"
                             val age = detailsDoc.getString("age")?.toIntOrNull() ?: -1

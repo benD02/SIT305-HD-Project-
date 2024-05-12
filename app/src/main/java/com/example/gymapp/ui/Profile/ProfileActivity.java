@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.gymapp.R;
 import com.example.gymapp.databinding.ActivityCreatorBinding;
+import com.example.gymapp.ui.AppData.AppData;
 import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.Progress.ProgressActivity;
 import com.example.gymapp.ui.Workout.WorkoutActivity;
@@ -26,8 +27,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        activeUser = getIntent().getParcelableExtra("activeUser");
-        workoutPlan = getIntent().getParcelableArrayListExtra("workoutPlan");
+        activeUser = AppData.getInstance().getActiveUser();
+        workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
+
 
         Log.d("loadData", activeUser.toString());
         Log.d("loadData", workoutPlan.toString());
@@ -40,16 +42,12 @@ public class ProfileActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.navigation_workout) {
                 Intent intent = new Intent(getApplicationContext(), WorkoutActivity.class);
-                intent.putExtra("user", activeUser);
-                intent.putExtra("workoutPlan", new  ArrayList(workoutPlan));
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();
                 return true;
             } else if (id == R.id.navigation_progress) {
                 Intent intent = new Intent(getApplicationContext(), ProgressActivity.class);
-                intent.putExtra("user", activeUser);
-                intent.putExtra("workoutPlan", new ArrayList(workoutPlan));
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_enter, R.anim.fade_exit);
                 finish();
