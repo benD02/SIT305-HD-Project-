@@ -1,32 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="16dp"
     android:background="@drawable/gradient_background"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_gravity="center_horizontal">
+
+    </LinearLayout>
+
     <TextView
+        android:id="@+id/tvEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50dp"
-        android:text="WORKOUT ACTIVITY"/>
+        android:text="Week: 1"
+        android:textColor="@color/gray"
+        android:textSize="50dp"/>
 
 
-
-    <FrameLayout
-        android:id="@+id/container"
+    <LinearLayout
+        android:id="@+id/workoutContainer"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/gradient_background"
-        android:layout_weight="1"/>
+        android:layout_height="520dp"
+        android:layout_marginTop="70dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="12dp"
+        android:background="@drawable/profile_lower_section">
+
+        <TextView
+            android:id="@+id/tvDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="day"
+            android:textColor="@color/white"
+            android:textSize="40dp"/>
+
+        <ScrollView
+            android:id="@+id/workoutDetails"
+            android:layout_width="match_parent"
+            android:layout_height="370dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/workoutDetailsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+
+        </ScrollView>
+
+
+        <Button
+            android:id="@+id/finishButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Finish"
+            android:textSize="30dp"
+            app:icon="@drawable/baseline_done_24"/>
+
+
+    </LinearLayout>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:addStatesFromChildren="false"
+        android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="30dp"
@@ -38,5 +91,5 @@
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_menu" />
 
+</RelativeLayout >
 
-</LinearLayout>
