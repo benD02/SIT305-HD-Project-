@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainActivityLayout"
     android:layout_width="match_parent"
@@ -7,26 +7,111 @@
     android:background="@drawable/gradient_background"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="50dp"
-        android:text="PROFILE ACTIVITY"/>
-
-
-
-    <FrameLayout
-        android:id="@+id/container"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@drawable/gradient_background"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:layout_gravity="center_horizontal">
 
+        <LinearLayout
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvProfileName"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="NAME"
+                android:textSize="50dp"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Email"
+                android:textColor="@color/gray"
+                android:textSize="20dp"/>
+
+
+            <TextView
+                android:id="@+id/tvLvl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Level:"
+                android:textColor="@color/gray"
+                android:textSize="20dp"/>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/AccountSettings"
+                    android:textAlignment="textStart"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Account "
+                    android:textSize="10sp"
+
+                    app:icon="@drawable/baseline_manage_accounts_24">
+
+                </Button>
+                <Button
+                    android:id="@+id/btnEditProfile"
+                    android:textAlignment="textStart"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    android:textSize="10sp"
+                    app:icon="@drawable/baseline_display_settings_24">
+
+                </Button>
+
+
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+        <ImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="100dp"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_height="100dp"
+            android:background="@drawable/profile_circle" />
+
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="500dp"
+        android:layout_height="900dp"
+        android:layout_marginTop="186dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/profile_lower_section">
+
+
+    </LinearLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:addStatesFromChildren="false"
+        android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="30dp"
@@ -39,4 +124,4 @@
         app:menu="@menu/bottom_nav_menu" />
 
 
-</LinearLayout>
+</RelativeLayout >

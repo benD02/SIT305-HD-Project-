@@ -6,7 +6,7 @@ import com.example.gymapp.ui.Profile.User;
 import java.util.ArrayList;
 import java.util.List;
 
-//This appData class is used to store the session data of both activeUser and their workout plan
+//This appData class is a singleton used to store the session data of both activeUser and their workout plan
 
 
 //Here is some code used to set and access the global variable from any activity or fragment
