@@ -9,6 +9,7 @@ import androidx.navigation.ui.NavigationUI;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -93,20 +94,27 @@ public class WorkoutActivity extends AppCompatActivity {
 
             workoutDetailsContainer.removeAllViews(); // Clear previous exercises
             for (Exercise exercise : day.exercises) {
-                TextView tvExercise = new TextView(this);
-                tvExercise.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                tvExercise.setTextSize(20);
-                tvExercise.setTextColor(getResources().getColor(R.color.white));
-                String exerciseDetails = String.format("%s - Reps: %s, Sets: %s, Weight: %s, Time: %s",
-                        exercise.name, exercise.reps, exercise.sets, exercise.weight, exercise.time);
-                tvExercise.setText(exerciseDetails);
-                workoutDetailsContainer.addView(tvExercise);
+                View exerciseView = LayoutInflater.from(this).inflate(R.layout.exercise_item, workoutDetailsContainer, false);
+
+                TextView tvExerciseName = exerciseView.findViewById(R.id.tvExerciseName);
+                TextView tvReps = exerciseView.findViewById(R.id.tvReps);
+                TextView tvSets = exerciseView.findViewById(R.id.tvSets);
+                TextView tvWeight = exerciseView.findViewById(R.id.tvWeight);
+                TextView tvTime = exerciseView.findViewById(R.id.tvTime);
+
+                tvExerciseName.setText(exercise.name);
+                tvReps.setText("Reps: " + exercise.reps);
+                tvSets.setText("Sets: " + exercise.sets);
+                tvWeight.setText("Weight: " + exercise.weight);
+                tvTime.setText("Time: " + exercise.time);
+
+                workoutDetailsContainer.addView(exerciseView);
             }
         } else {
             tvDay.setText("Day not found: " + dayLabel);
         }
     }
+
 
     private Day findDayByLabel(String label) {
         for (Day day : workoutPlan) {
