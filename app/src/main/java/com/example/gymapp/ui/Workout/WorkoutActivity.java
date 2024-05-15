@@ -8,6 +8,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.example.gymapp.ui.Profile.ProfileActivity;
 import com.example.gymapp.ui.Profile.User;
 import com.example.gymapp.ui.Progress.ProgressActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 
@@ -77,6 +79,9 @@ public class WorkoutActivity extends AppCompatActivity {
         });
 
 
+
+
+
     }
 
     private void setupUI() {
@@ -107,6 +112,15 @@ public class WorkoutActivity extends AppCompatActivity {
                 tvSets.setText("Sets: " + exercise.sets);
                 tvWeight.setText("Weight: " + exercise.weight);
                 tvTime.setText("Time: " + exercise.time);
+
+                Button startExerciseButton = exerciseView.findViewById(R.id.exercise_start);
+                startExerciseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Your code to handle the button click
+                        showExerciseDetails(exercise); // Assuming you have a method to handle showing details
+                    }
+                });
 
                 workoutDetailsContainer.addView(exerciseView);
             }
@@ -149,4 +163,108 @@ public class WorkoutActivity extends AppCompatActivity {
         });
 
     }
+
+
+    private void showExerciseDetails(Exercise exercise) {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.exercise_details_bottom_sheet, null);
+
+        // Initialize Views
+        TextView tvName = bottomSheetView.findViewById(R.id.tvExerciseDetailName);
+        TextView tvReps = bottomSheetView.findViewById(R.id.tvDetailReps);
+        TextView tvSets = bottomSheetView.findViewById(R.id.tvDetailSets);
+        TextView tvWeight = bottomSheetView.findViewById(R.id.tvDetailWeight);
+        TextView tvTime = bottomSheetView.findViewById(R.id.tvDetailTime);
+        TextView tvCounter = bottomSheetView.findViewById(R.id.tvCounter);
+        Button btnStartSet = bottomSheetView.findViewById(R.id.btnStartStopSet);
+        Button btnPauseSet = bottomSheetView.findViewById(R.id.btnPauseSet);
+        Button btnFinishExercise = bottomSheetView.findViewById(R.id.btnFinishExercise);
+        TextView tvSet = bottomSheetView.findViewById(R.id.tvSet);
+
+
+        // Set exercise details
+        tvName.setText(exercise.name);
+        tvReps.setText("Reps: " + exercise.reps);
+        tvSets.setText("Sets: " + exercise.sets);
+        tvWeight.setText("Weight: " + exercise.weight);
+        tvTime.setText("Time: " + exercise.time);
+
+        int totalSets = Integer.parseInt(exercise.sets);
+        int[] currentSet = {1}; // Start with the first set
+        tvSet.setText("Set: " + currentSet[0] + "/" + totalSets);
+
+        // Initially hide the pause button
+        btnPauseSet.setVisibility(View.GONE);
+
+        // Timer setup
+        final long[] timeLeft = {Long.parseLong(exercise.time) * 1000}; // Assuming time is in seconds
+        final CountDownTimer[] timer = new CountDownTimer[1];
+
+        btnStartSet.setOnClickListener(v -> {
+            // Reset the time left to the initial full duration at the start of each set
+            timeLeft[0] = Long.parseLong(exercise.time) * 1000;
+
+            if (timer[0] != null) {
+                timer[0].cancel(); // Cancel any existing timer
+            }
+
+            timer[0] = new CountDownTimer(timeLeft[0], 1000) {
+                public void onTick(long millisUntilFinished) {
+                    timeLeft[0] = millisUntilFinished;
+                    tvCounter.setText("Time: " + millisUntilFinished / 1000 + "s");
+                }
+
+                public void onFinish() {
+                    tvCounter.setText("Set Complete!");
+                    btnPauseSet.setVisibility(View.GONE); // Hide pause button when timer finishes
+
+                    currentSet[0]++;
+                    if (currentSet[0] <= totalSets) {
+                        tvSet.setText("Set: " + currentSet[0] + "/" + totalSets);
+                        btnStartSet.setText("Start Next Set");
+                    } else {
+                        btnStartSet.setText("All Sets Complete");
+                        btnStartSet.setEnabled(false); // Disable the start button when all sets are completed
+                    }
+                }
+            }.start();
+            btnPauseSet.setVisibility(View.VISIBLE); // Show the pause button only after starting the set
+        });
+
+        btnPauseSet.setOnClickListener(v -> {
+            if ("Pause Set".equals(btnPauseSet.getText().toString())) {
+                if (timer[0] != null) {
+                    timer[0].cancel();
+                    tvCounter.setText("Paused at: " + timeLeft[0] / 1000 + "s");
+                }
+                btnPauseSet.setText("Resume Set");
+            } else {
+                timer[0] = new CountDownTimer(timeLeft[0], 1000) {
+                    public void onTick(long millisUntilFinished) {
+                        timeLeft[0] = millisUntilFinished;
+                        tvCounter.setText("Time: " + millisUntilFinished / 1000 + "s");
+                    }
+
+                    public void onFinish() {
+                        tvCounter.setText("Set Complete!");
+                        btnPauseSet.setVisibility(View.GONE);
+                    }
+                }.start();
+                btnPauseSet.setText("Pause Set");
+            }
+        });
+
+
+        btnFinishExercise.setOnClickListener(v -> {
+            if (timer[0] != null) {
+                timer[0].cancel();
+            }
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+    }
+
+
 }
