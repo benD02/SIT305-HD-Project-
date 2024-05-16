@@ -1,5 +1,6 @@
 package com.example.gymapp.ui.Workout;
 
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -25,18 +26,17 @@ import com.example.gymapp.ui.ExerciseClasses.Exercise;
 import com.example.gymapp.ui.Profile.ProfileActivity;
 import com.example.gymapp.ui.Profile.User;
 import com.example.gymapp.ui.Progress.ProgressActivity;
+import com.example.gymapp.ui.Progress.ProgressTracker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
-
 public class WorkoutActivity extends AppCompatActivity {
 
     private User activeUser;
     private ArrayList<Day> workoutPlan;
-    private TextView tvDay;
-
-    private int currentDayNumber  = 1; // Tracks the current workout day, starts at Day 1
+    private TextView tvDay, tvWeek;
+    private ProgressTracker progressTracker;
     private Button finishButton;
     private ScrollView workoutDetails;
     private LinearLayout workoutDetailsContainer;
@@ -48,55 +48,63 @@ public class WorkoutActivity extends AppCompatActivity {
 
         activeUser = AppData.getInstance().getActiveUser();
         workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
+        progressTracker = AppData.getInstance().getProgressTracker();
 
+        if (progressTracker == null) {
+            progressTracker = new ProgressTracker(activeUser.getDurationInWeeks());
+            AppData.getInstance().setProgressTracker(progressTracker);
+        }
+
+        Log.d("WorkoutActivity", "Initial Progress: Day " + progressTracker.getCurrentDayNumber() + ", Week " + progressTracker.getCurrentWeekNumber());
         Log.d("loadData", activeUser.toString());
         Log.d("loadData", workoutPlan.toString());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_workout);
-        bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
-        navBar( bottomNavigationView);
+        navBar(bottomNavigationView);
 
         setupUI();
-        loadDay("Day " + currentDayNumber);
-
-
-
+        loadDay("Day " + progressTracker.getCurrentDayNumber());
 
         finishButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentDayNumber++;
-                String nextDayLabel = "Day " + currentDayNumber;
+                Log.d("WorkoutActivity", "Before Update: Day " + progressTracker.getCurrentDayNumber() + ", Week " + progressTracker.getCurrentWeekNumber());
+
+                String nextDayLabel = "Day " + (progressTracker.getCurrentDayNumber() + 1);
                 Day nextDay = findDayByLabel(nextDayLabel);
-                if (nextDay != null) {
-                    loadDay(nextDayLabel);
-                } else {
+
+                progressTracker.updateProgress(nextDay != null);
+                Log.d("WorkoutActivity", "After Update: Day " + progressTracker.getCurrentDayNumber() + ", Week " + progressTracker.getCurrentWeekNumber());
+
+                if (progressTracker.isProgramComplete()) {
                     finishButton.setText("Workout Complete");
                     finishButton.setEnabled(false);
+                } else {
+                    tvWeek.setText("Week " + progressTracker.getCurrentWeekNumber());
+                    loadDay("Day " + progressTracker.getCurrentDayNumber());
                 }
+
+                // Save progress tracker instance
+                AppData.getInstance().setProgressTracker(progressTracker);
             }
         });
-
-
-
-
-
     }
 
     private void setupUI() {
         tvDay = findViewById(R.id.tvDay);
+        tvWeek = findViewById(R.id.tvWeek);
         workoutDetails = findViewById(R.id.workoutDetails);
         workoutDetailsContainer = findViewById(R.id.workoutDetailsContainer);
         finishButton = findViewById(R.id.finishButton);
 
+        tvWeek.setText("Week " + progressTracker.getCurrentWeekNumber());
     }
 
     private void loadDay(String dayLabel) {
         Day day = findDayByLabel(dayLabel);
         if (day != null) {
             tvDay.setText(day.dayLabel);
-
             workoutDetailsContainer.removeAllViews(); // Clear previous exercises
             for (Exercise exercise : day.exercises) {
                 View exerciseView = LayoutInflater.from(this).inflate(R.layout.exercise_item, workoutDetailsContainer, false);
@@ -117,8 +125,7 @@ public class WorkoutActivity extends AppCompatActivity {
                 startExerciseButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Your code to handle the button click
-                        showExerciseDetails(exercise); // Assuming you have a method to handle showing details
+                        showExerciseDetails(exercise);
                     }
                 });
 
@@ -129,7 +136,6 @@ public class WorkoutActivity extends AppCompatActivity {
         }
     }
 
-
     private Day findDayByLabel(String label) {
         for (Day day : workoutPlan) {
             if (day.dayLabel.equals(label)) {
@@ -139,9 +145,7 @@ public class WorkoutActivity extends AppCompatActivity {
         return null; // Return null if no matching day is found
     }
 
-
-
-    public void navBar(BottomNavigationView bottomNavigationView){
+    public void navBar(BottomNavigationView bottomNavigationView) {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.navigation_profile) {
@@ -161,10 +165,7 @@ public class WorkoutActivity extends AppCompatActivity {
             }
             return false;
         });
-
     }
-
-
     private void showExerciseDetails(Exercise exercise) {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.exercise_details_bottom_sheet, null);
@@ -180,7 +181,6 @@ public class WorkoutActivity extends AppCompatActivity {
         Button btnPauseSet = bottomSheetView.findViewById(R.id.btnPauseSet);
         Button btnFinishExercise = bottomSheetView.findViewById(R.id.btnFinishExercise);
         TextView tvSet = bottomSheetView.findViewById(R.id.tvSet);
-
 
         // Set exercise details
         tvName.setText(exercise.name);
@@ -254,7 +254,6 @@ public class WorkoutActivity extends AppCompatActivity {
             }
         });
 
-
         btnFinishExercise.setOnClickListener(v -> {
             if (timer[0] != null) {
                 timer[0].cancel();
@@ -265,6 +264,4 @@ public class WorkoutActivity extends AppCompatActivity {
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
-
-
 }

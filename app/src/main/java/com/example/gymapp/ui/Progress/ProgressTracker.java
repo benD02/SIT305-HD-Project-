@@ -1,0 +1,51 @@
+package com.example.gymapp.ui.Progress;
+
+import android.util.Log;
+
+public class ProgressTracker {
+    private int currentDayNumber;
+    private int currentWeekNumber;
+    private int durationInWeeks;
+
+    public ProgressTracker(int durationInWeeks) {
+        this.currentDayNumber = 1;
+        this.currentWeekNumber = 1;
+        this.durationInWeeks = durationInWeeks;
+    }
+
+    public int getCurrentDayNumber() {
+        return currentDayNumber;
+    }
+
+    public int getCurrentWeekNumber() {
+        return currentWeekNumber;
+    }
+
+    public void incrementDay() {
+        currentDayNumber++;
+    }
+
+    public void resetDay() {
+        currentDayNumber = 1;
+    }
+
+    public void incrementWeek() {
+        currentWeekNumber++;
+    }
+
+    public boolean isProgramComplete() {
+        return currentWeekNumber > durationInWeeks;
+    }
+
+    public void updateProgress(boolean dayExists) {
+        if (dayExists) {
+            incrementDay();
+        } else {
+            resetDay();
+            incrementWeek();
+        }
+        Log.d("ProgressTracker", "Updated Progress: Day " + currentDayNumber + ", Week " + currentWeekNumber);
+    }
+
+
+}
