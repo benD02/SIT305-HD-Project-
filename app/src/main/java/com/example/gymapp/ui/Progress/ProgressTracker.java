@@ -11,9 +11,9 @@ public class ProgressTracker {
     private int durationInWeeks;
 
 
-    public ProgressTracker(int durationInWeeks) {
-        this.currentDayNumber = 1;
-        this.currentWeekNumber = 1;
+    public ProgressTracker(int currentDayNumber, int currentWeekNumber, int durationInWeeks) {
+        this.currentDayNumber = currentDayNumber;
+        this.currentWeekNumber = currentWeekNumber;
         this.durationInWeeks =  durationInWeeks;
     }
 

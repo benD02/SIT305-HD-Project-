@@ -29,6 +29,8 @@ import com.example.gymapp.ui.Progress.ProgressActivity;
 import com.example.gymapp.ui.Progress.ProgressTracker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 public class WorkoutActivity extends AppCompatActivity {
@@ -40,18 +42,23 @@ public class WorkoutActivity extends AppCompatActivity {
     private Button finishButton;
     private ScrollView workoutDetails;
     private LinearLayout workoutDetailsContainer;
+    private FirebaseFirestore db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout);
 
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+
         activeUser = AppData.getInstance().getActiveUser();
         workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
         progressTracker = AppData.getInstance().getProgressTracker();
 
         if (progressTracker == null) {
-            progressTracker = new ProgressTracker(activeUser.getDurationInWeeks());
+            progressTracker = new ProgressTracker(1, 1, activeUser.getDurationInWeeks());
             AppData.getInstance().setProgressTracker(progressTracker);
         }
 
@@ -87,6 +94,9 @@ public class WorkoutActivity extends AppCompatActivity {
 
                 // Save progress tracker instance
                 AppData.getInstance().setProgressTracker(progressTracker);
+
+                // Save progress to Firestore
+                saveProgressToFirestore();
             }
         });
     }
@@ -263,5 +273,15 @@ public class WorkoutActivity extends AppCompatActivity {
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+    }
+
+    private void saveProgressToFirestore() {
+        db.collection("users")
+                .document(activeUser.getUid())
+                .collection("progress")
+                .document("currentProgress")
+                .set(progressTracker, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Progress successfully written!"))
+                .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
     }
 }

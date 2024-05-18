@@ -12,12 +12,14 @@ import com.example.gymapp.ui.ExerciseClasses.Day
 import com.example.gymapp.ui.ExerciseClasses.Exercise
 import com.example.gymapp.ui.Profile.ProfileActivity
 import com.example.gymapp.ui.Profile.User
+import com.example.gymapp.ui.Progress.ProgressTracker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
     private var activeUser: User? = null
     private var workoutPlan: MutableList<Day> = mutableListOf()
+    private var progressTracker: ProgressTracker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +31,18 @@ class MainActivity : AppCompatActivity() {
                 activeUser = loadedUser
                 // Load workout data after user data is loaded
                 loadWorkoutData(uid) {
-                    // Proceed to ProfileActivity o
+                    // Load progress data after workout data is loaded
+                    loadProgressData(uid) {
+                        // Set the loaded data in AppData singleton
+                        AppData.getInstance().activeUser = activeUser
+                        AppData.getInstance().workoutPlan = workoutPlan
+                        AppData.getInstance().progressTracker = progressTracker
 
-                    AppData.getInstance().activeUser = activeUser;
-                    AppData.getInstance().workoutPlan = workoutPlan;
-                    val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                        // Proceed to ProfileActivity
+                        val intent = Intent(this, ProfileActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
                 }
             }
         } else {
@@ -122,6 +129,33 @@ class MainActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load workout data: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+
+    private fun loadProgressData(uid: String, onLoaded: (ProgressTracker) -> Unit) {
+        val progressDocRef = FirebaseFirestore.getInstance().collection("users").document(uid).collection("progress").document("currentProgress")
+
+        progressDocRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val currentDayNumber = document.getLong("currentDayNumber")?.toInt() ?: 1
+                val currentWeekNumber = document.getLong("currentWeekNumber")?.toInt() ?: 1
+                val durationInWeeks = activeUser?.durationInWeeks ?: 1
+
+                val loadedProgress = ProgressTracker(
+                    currentDayNumber,
+                    currentWeekNumber,
+                    durationInWeeks,
+
+                )
+                onLoaded(loadedProgress)
+            } else {
+                Toast.makeText(this, "Progress data not found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+            .addOnFailureListener { e ->
+                Log.e("loadProgressData", "Failed to load progress data", e)
+                Toast.makeText(this, "Failed to load progress data: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 }
