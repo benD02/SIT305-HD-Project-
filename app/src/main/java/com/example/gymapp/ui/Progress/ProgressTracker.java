@@ -2,15 +2,19 @@ package com.example.gymapp.ui.Progress;
 
 import android.util.Log;
 
+import com.example.gymapp.ui.AppData.AppData;
+import com.example.gymapp.ui.Profile.User;
+
 public class ProgressTracker {
     private int currentDayNumber;
     private int currentWeekNumber;
     private int durationInWeeks;
 
+
     public ProgressTracker(int durationInWeeks) {
         this.currentDayNumber = 1;
         this.currentWeekNumber = 1;
-        this.durationInWeeks = durationInWeeks;
+        this.durationInWeeks =  durationInWeeks;
     }
 
     public int getCurrentDayNumber() {

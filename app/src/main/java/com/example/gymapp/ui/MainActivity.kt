@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity() {
                             val age = detailsDoc.getString("age")?.toIntOrNull() ?: -1
                             val weight = detailsDoc.getString("weight")?.toDoubleOrNull() ?: -1.0
                             val height = detailsDoc.getString("height")?.toDoubleOrNull() ?: -1.0
-                            val duration = detailsDoc.getString("duration")?.toIntOrNull() ?: -1
                             val days = detailsDoc.getString("days")?.toIntOrNull() ?: -1
+                            val duration = detailsDoc.getString("duration")?.toIntOrNull() ?: -1
                             val goals = ArrayList<String>(detailsDoc.get("goals") as? List<String> ?: listOf())
 
                             val loadedUser = User(
@@ -73,8 +73,8 @@ class MainActivity : AppCompatActivity() {
                                 age,
                                 weight,
                                 height,
-                                duration,
                                 days,
+                                duration,
                                 goals
                             )
                             onLoaded(loadedUser)
