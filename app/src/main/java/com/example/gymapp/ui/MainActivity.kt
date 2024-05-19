@@ -1,6 +1,5 @@
 package com.example.gymapp.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -32,11 +31,15 @@ class MainActivity : AppCompatActivity() {
                 // Load workout data after user data is loaded
                 loadWorkoutData(uid) {
                     // Load progress data after workout data is loaded
-                    loadProgressData(uid) {
+                    loadProgressData(uid) { loadedProgress ->
                         // Set the loaded data in AppData singleton
                         AppData.getInstance().activeUser = activeUser
                         AppData.getInstance().workoutPlan = workoutPlan
+                        progressTracker = loadedProgress
                         AppData.getInstance().progressTracker = progressTracker
+
+                        // Log loaded progress
+                        Log.d("MainActivity", "Loaded Progress: $progressTracker")
 
                         // Proceed to ProfileActivity
                         val intent = Intent(this, ProfileActivity::class.java)
@@ -103,7 +106,6 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-
     private fun loadWorkoutData(uid: String, onLoaded: () -> Unit) {
         FirebaseFirestore.getInstance().collection("users").document(uid).collection("workoutPlans")
             .get()
@@ -132,8 +134,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-
-    private fun loadProgressData(uid: String, onLoaded: (ProgressTracker) -> Unit) {
+    private fun loadProgressData(uid: String, onLoaded: (ProgressTracker?) -> Unit) {
         val progressDocRef = FirebaseFirestore.getInstance().collection("users").document(uid).collection("progress").document("currentProgress")
 
         progressDocRef.get().addOnSuccessListener { document ->
@@ -142,20 +143,24 @@ class MainActivity : AppCompatActivity() {
                 val currentWeekNumber = document.getLong("currentWeekNumber")?.toInt() ?: 1
                 val durationInWeeks = activeUser?.durationInWeeks ?: 1
 
-                val loadedProgress = ProgressTracker(
-                    currentDayNumber,
-                    currentWeekNumber,
-                    durationInWeeks,
+                val loadedProgress = ProgressTracker(currentDayNumber, currentWeekNumber, durationInWeeks)
 
-                )
+                Log.d("MainActivity", "Loaded Progress: Day $currentDayNumber, Week $currentWeekNumber")
+
                 onLoaded(loadedProgress)
+
+                Log.d("MainActivityLoaded", loadedProgress.toString())
+
             } else {
+                Log.d("MainActivity", "Progress document does not exist.")
                 Toast.makeText(this, "Progress data not found.", Toast.LENGTH_SHORT).show()
+                onLoaded(null)
             }
         }
             .addOnFailureListener { e ->
-                Log.e("loadProgressData", "Failed to load progress data", e)
+                Log.e("MainActivity", "Failed to load progress data", e)
                 Toast.makeText(this, "Failed to load progress data: ${e.message}", Toast.LENGTH_LONG).show()
+                onLoaded(null)
             }
     }
 }

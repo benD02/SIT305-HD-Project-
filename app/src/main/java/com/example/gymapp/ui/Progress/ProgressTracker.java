@@ -51,5 +51,11 @@ public class ProgressTracker {
         Log.d("ProgressTracker", "Updated Progress: Day " + currentDayNumber + ", Week " + currentWeekNumber);
     }
 
+    @Override
+    public String toString() {
+        return "Progress{" +
+                "Current day number='" + currentDayNumber + '\'' +
+                ", Current week number='" + currentWeekNumber + '\'' ;
+    }
 
 }

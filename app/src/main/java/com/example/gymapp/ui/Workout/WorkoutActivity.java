@@ -57,6 +57,9 @@ public class WorkoutActivity extends AppCompatActivity {
         workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
         progressTracker = AppData.getInstance().getProgressTracker();
 
+        Log.d("loadData", progressTracker.toString());
+
+
         if (progressTracker == null) {
             progressTracker = new ProgressTracker(1, 1, activeUser.getDurationInWeeks());
             AppData.getInstance().setProgressTracker(progressTracker);
@@ -65,6 +68,7 @@ public class WorkoutActivity extends AppCompatActivity {
         Log.d("WorkoutActivity", "Initial Progress: Day " + progressTracker.getCurrentDayNumber() + ", Week " + progressTracker.getCurrentWeekNumber());
         Log.d("loadData", activeUser.toString());
         Log.d("loadData", workoutPlan.toString());
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_workout);

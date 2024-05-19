@@ -19,6 +19,8 @@ import java.util.ArrayList;
 public class ProgressActivity extends AppCompatActivity {
     private User activeUser;
     private ArrayList<Day> workoutPlan;
+    private ProgressTracker progressTracker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,7 @@ public class ProgressActivity extends AppCompatActivity {
 
         activeUser = AppData.getInstance().getActiveUser();
         workoutPlan = (ArrayList<Day>) AppData.getInstance().getWorkoutPlan();
+        progressTracker = AppData.getInstance().getProgressTracker();
 
         Log.d("loadData", activeUser.toString());
         Log.d("loadData", workoutPlan.toString());
