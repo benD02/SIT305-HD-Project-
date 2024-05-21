@@ -53,7 +53,7 @@
         android:id="@+id/tvCounter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="counter"
+        android:text="0:00"
         android:textSize="18sp"
         android:textColor="@color/white" />
     <TextView

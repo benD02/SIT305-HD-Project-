@@ -14,17 +14,37 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center">
+
+        <TextView
+            android:padding="8dp"
+            android:id="@+id/tvWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="week"
+            android:background="@drawable/red_button_background"
+            android:textColor="@color/white"
+            android:textSize="25dp"
+            android:layout_marginRight="60dp"
+            android:drawableStart="@android:drawable/ic_menu_week"/>
+
+
+
+        <TextView
+            android:padding="8dp"
+            android:background="@drawable/blue_background"
+            android:id="@+id/tvDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="day"
+            android:textColor="@color/white"
+            android:textSize="25dp"
+            android:drawableStart="@android:drawable/ic_menu_today"/>
+
+
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvWeek"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Week: 1"
-        android:textColor="@color/gray"
-        android:textSize="50dp"/>
 
 
     <LinearLayout
@@ -34,21 +54,14 @@
         android:layout_marginTop="70dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="12dp"
-        android:background="@drawable/profile_lower_section">
+        android:padding="1dp">
 
-        <TextView
-            android:id="@+id/tvDay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="day"
-            android:textColor="@color/white"
-            android:textSize="40dp"/>
+
 
         <ScrollView
             android:id="@+id/workoutDetails"
             android:layout_width="match_parent"
-            android:layout_height="370dp"
+            android:layout_height="400dp"
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
@@ -64,11 +77,12 @@
 
         <Button
             android:id="@+id/finishButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Finish"
-            android:textSize="30dp"
-            app:icon="@drawable/baseline_done_24"/>
+            android:textSize="25dp"
+            app:icon="@drawable/baseline_done_24" />
 
 
     </LinearLayout>

@@ -19,7 +19,7 @@
 
 
     <ScrollView
-        android:id="@+id/container"
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/gradient_background"
@@ -39,7 +39,7 @@
     </ScrollView>
 
     <LinearLayout
-        android:padding="8dp"
+        android:padding="18dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -56,9 +56,9 @@
 
         <ProgressBar
             android:id="@+id/progress_pb"
-            style="@android:style/Widget.Material.ProgressBar.Horizontal"
+            style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="300dp"
-            android:layout_height="100dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:indeterminate="false"
             android:max="100"

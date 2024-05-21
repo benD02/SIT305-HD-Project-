@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.gymapp.R;
@@ -33,6 +34,7 @@ public class ProgressActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private LinearLayout progressBarContainer;
     private TextView progressTextView;
+    private ScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class ProgressActivity extends AppCompatActivity {
         progressBarContainer = findViewById(R.id.progressBarContainer);
         progressBar = findViewById(R.id.progress_pb);
         progressTextView = findViewById(R.id.progress_tv);
+        scrollView = findViewById(R.id.scrollView);
 
         updateProgress();
 
@@ -82,7 +85,6 @@ public class ProgressActivity extends AppCompatActivity {
 
         int totalDays = activeUser.getDurationInWeeks() * activeUser.getDaysPerWeek();
         int completedDays = (progressTracker.getCurrentWeekNumber() - 1) * activeUser.getDaysPerWeek() + progressTracker.getCurrentDayNumber();
-
         for (int i = 1; i <= totalDays; i++) {
             // Inflate the dot layout
             View dotLayout = LayoutInflater.from(this).inflate(R.layout.dot_layout, progressBarContainer, false);
@@ -103,6 +105,14 @@ public class ProgressActivity extends AppCompatActivity {
                 View lineLayout = LayoutInflater.from(this).inflate(R.layout.line_layout, progressBarContainer, false);
                 progressBarContainer.addView(lineLayout);
             }
+
+            // Auto-scroll to the current day
+            if (i == completedDays) {
+                dotLayout.post(() -> {
+                    int scrollToY = dotLayout.getTop();
+                    scrollView.smoothScrollTo(0, scrollToY);
+                });
+            }
         }
     }
 
@@ -112,7 +122,7 @@ public class ProgressActivity extends AppCompatActivity {
         int progress = (int) ((completedDays / (float) totalDays) * 100);
 
         progressBar.setProgress(progress);
-        progressTextView.setText(progress + "% completed");
+        progressTextView.setText("Your plan is " + progress + "% completed");
     }
 
 
