@@ -1,19 +1,20 @@
 <!-- Layout for the BottomSheetDialogFragment -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="600dp"
     android:orientation="vertical"
     android:padding="16dp"
     android:id="@+id/bottomSheetContainer"
 
-    android:background="@color/white">
+    android:background="#232323">
 
     <TextView
         android:id="@+id/tvExerciseDetailName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:text="Exercise Name"/>
 
     <!-- Additional Views for reps, sets, etc. -->
@@ -23,28 +24,28 @@
         android:layout_height="wrap_content"
         android:text="Reps: 10"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/white" />
     <TextView
         android:id="@+id/tvDetailSets"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sets: 10"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/white" />
     <TextView
         android:id="@+id/tvDetailWeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Weight: 10"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/white" />
     <TextView
         android:id="@+id/tvDetailTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Time: 10"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/white" />
 
     <!-- Add more views for sets, weight, time as needed -->
     <TextView
@@ -54,7 +55,7 @@
         android:layout_height="wrap_content"
         android:text="counter"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/white" />
     <TextView
         android:layout_marginTop="20dp"
         android:id="@+id/tvSet"
@@ -62,21 +63,68 @@
         android:layout_height="wrap_content"
         android:text="Set"
         android:textSize="18sp"
-        android:textColor="@color/black"/>
-    <Button
-        android:id="@+id/btnStartStopSet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Start Set"/>
-    <Button
-        android:id="@+id/btnPauseSet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pause Set"/>
+        android:textColor="@color/white" />
 
     <Button
+
+        android:id="@+id/btnStartStopSet"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Set"
+        app:icon="@drawable/baseline_start_24"
+        app:iconTint="#FFFFFF" />
+
+    <Button
+        android:id="@+id/btnPauseSet"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause Set"
+        app:icon="@drawable/baseline_pause_24" />
+
+    <Button
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:id="@+id/btnFinishExercise"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Finish Exercise"/>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:id="@+id/tv_task_due"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/banner_background"
+        android:padding="8dp"
+        android:text="you have 0 tasks due"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" AI tip"
+            android:textColor="@color/black"
+            android:drawableStart="@drawable/ai_icon"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"/>
+
+        <TextView
+            android:id="@+id/aiResponse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Loading..."
+            android:textColor="@color/black"
+            android:textSize="18sp"
+             />
+
+    </LinearLayout>
+
+
+
 </LinearLayout>

@@ -17,9 +17,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.gymapp.R;
-import com.example.gymapp.databinding.ActivityCreatorBinding;
 import com.example.gymapp.ui.AppData.AppData;
 import com.example.gymapp.ui.ExerciseClasses.Day;
 import com.example.gymapp.ui.ExerciseClasses.Exercise;
@@ -27,12 +27,23 @@ import com.example.gymapp.ui.Profile.ProfileActivity;
 import com.example.gymapp.ui.Profile.User;
 import com.example.gymapp.ui.Progress.ProgressActivity;
 import com.example.gymapp.ui.Progress.ProgressTracker;
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class WorkoutActivity extends AppCompatActivity {
 
     private User activeUser;
@@ -112,6 +123,7 @@ public class WorkoutActivity extends AppCompatActivity {
         workoutDetailsContainer = findViewById(R.id.workoutDetailsContainer);
         finishButton = findViewById(R.id.finishButton);
 
+
         tvWeek.setText("Week " + progressTracker.getCurrentWeekNumber());
     }
 
@@ -128,6 +140,8 @@ public class WorkoutActivity extends AppCompatActivity {
                 TextView tvSets = exerciseView.findViewById(R.id.tvSets);
                 TextView tvWeight = exerciseView.findViewById(R.id.tvWeight);
                 TextView tvTime = exerciseView.findViewById(R.id.tvTime);
+                TextView tvCompleted = exerciseView.findViewById(R.id.tvCompleted);
+
 
                 tvExerciseName.setText(exercise.name);
                 tvReps.setText("Reps: " + exercise.reps);
@@ -139,7 +153,7 @@ public class WorkoutActivity extends AppCompatActivity {
                 startExerciseButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showExerciseDetails(exercise);
+                        showExerciseDetails(exercise, exerciseView);
                     }
                 });
 
@@ -180,7 +194,7 @@ public class WorkoutActivity extends AppCompatActivity {
             return false;
         });
     }
-    private void showExerciseDetails(Exercise exercise) {
+    private void showExerciseDetails(Exercise exercise,  View exerciseView) {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View bottomSheetView = LayoutInflater.from(this).inflate(R.layout.exercise_details_bottom_sheet, null);
 
@@ -195,6 +209,9 @@ public class WorkoutActivity extends AppCompatActivity {
         Button btnPauseSet = bottomSheetView.findViewById(R.id.btnPauseSet);
         Button btnFinishExercise = bottomSheetView.findViewById(R.id.btnFinishExercise);
         TextView tvSet = bottomSheetView.findViewById(R.id.tvSet);
+        TextView aiResponse = bottomSheetView.findViewById(R.id.aiResponse);
+
+        generativeAi(exercise.name, aiResponse);
 
         // Set exercise details
         tvName.setText(exercise.name);
@@ -239,6 +256,9 @@ public class WorkoutActivity extends AppCompatActivity {
                     } else {
                         btnStartSet.setText("All Sets Complete");
                         btnStartSet.setEnabled(false); // Disable the start button when all sets are completed
+
+                        TextView tvCompleted = exerciseView.findViewById(R.id.tvCompleted);
+                        tvCompleted.setText("Completed");
                     }
                 }
             }.start();
@@ -287,5 +307,45 @@ public class WorkoutActivity extends AppCompatActivity {
                 .set(progressTracker, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> Log.d("Firestore", "Progress successfully written!"))
                 .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
+    }
+
+
+
+    private void generativeAi(String topic,  TextView aiResponse){
+        GenerativeModel gm = new  GenerativeModel(/* modelName */ "gemini-pro",/* apiKey */  "AIzaSyDJxlEt0SvOaoocUIcorL-sDxaFjUXNU60");
+        GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+        Content content = new Content.Builder()
+                .addText( "Produce a single sentence tip on  " + topic +  " exercise")
+                .build();
+
+        Log.d("CreatorActivity", content.toString());
+
+
+        ExecutorService executor  = Executors.newSingleThreadExecutor();
+
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+        Log.d("CreatorActivity", response.toString());
+        Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+            @Override
+            public void onSuccess(GenerateContentResponse result) {
+                String resultText = result.getText();
+                runOnUiThread(() -> {
+                    aiResponse.setText(resultText);
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Error generating content", Toast.LENGTH_SHORT).show();
+                });
+                t.printStackTrace();
+            }
+        }, executor);
+
+
+
+
     }
 }
