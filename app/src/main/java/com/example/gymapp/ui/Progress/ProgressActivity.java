@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.gymapp.R;
@@ -28,7 +30,10 @@ public class ProgressActivity extends AppCompatActivity {
     private User activeUser;
     private ArrayList<Day> workoutPlan;
     private ProgressTracker progressTracker;
+    private ProgressBar progressBar;
     private LinearLayout progressBarContainer;
+    private TextView progressTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +70,11 @@ public class ProgressActivity extends AppCompatActivity {
         });
 
         progressBarContainer = findViewById(R.id.progressBarContainer);
+        progressBar = findViewById(R.id.progress_pb);
+        progressTextView = findViewById(R.id.progress_tv);
+
+        updateProgress();
+
         updateProgressBar();
     }
     private void updateProgressBar() {
@@ -74,55 +84,36 @@ public class ProgressActivity extends AppCompatActivity {
         int completedDays = (progressTracker.getCurrentWeekNumber() - 1) * activeUser.getDaysPerWeek() + progressTracker.getCurrentDayNumber();
 
         for (int i = 1; i <= totalDays; i++) {
-            // Create a FrameLayout to stack the day label on top of the dot
-            FrameLayout dotContainer = new FrameLayout(this);
-            LinearLayout.LayoutParams dotContainerParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            dotContainerParams.setMargins(0, 0, 0, 0);
-            dotContainer.setLayoutParams(dotContainerParams);
+            // Inflate the dot layout
+            View dotLayout = LayoutInflater.from(this).inflate(R.layout.dot_layout, progressBarContainer, false);
+            ImageView dot = dotLayout.findViewById(R.id.dotImage);
+            TextView dayLabel = dotLayout.findViewById(R.id.dayLabel);
 
-            // Add the dot
-            ImageView dot = new ImageView(this);
             if (i <= completedDays) {
                 dot.setImageResource(R.drawable.dot_complete);
             } else {
                 dot.setImageResource(R.drawable.dot_incomplete);
             }
-            FrameLayout.LayoutParams dotParams = new FrameLayout.LayoutParams(
-                    200, // Width of the dot
-                    200  // Height of the dot
-            );
-            dot.setLayoutParams(dotParams);
-            dotContainer.addView(dot);
+            dayLabel.setText("Day " + i);
 
-            // Add the day label
-            TextView dayLabel = new TextView(this);
-            dayLabel.setTextSize(15);
-            dayLabel.setText("day:" + i);
-            dayLabel.setGravity(Gravity.CENTER);
-            FrameLayout.LayoutParams labelParams = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-            );
-            dayLabel.setLayoutParams(labelParams);
-            dotContainer.addView(dayLabel);
+            progressBarContainer.addView(dotLayout);
 
-            progressBarContainer.addView(dotContainer);
-
-            // Add the line
+            // Inflate the line layout
             if (i < totalDays) {
-                View line = new View(this);
-                LinearLayout.LayoutParams lineParams = new LinearLayout.LayoutParams(
-                        10, // Width of the line
-                        100 // Height of the line
-                );
-                lineParams.setMargins(0, 0, 0, 0);
-                line.setLayoutParams(lineParams);
-                line.setBackgroundColor(getResources().getColor(R.color.line_color)); // Set the color of the line
-                progressBarContainer.addView(line);
+                View lineLayout = LayoutInflater.from(this).inflate(R.layout.line_layout, progressBarContainer, false);
+                progressBarContainer.addView(lineLayout);
             }
         }
     }
+
+    private void updateProgress() {
+        int totalDays = activeUser.getDurationInWeeks() * activeUser.getDaysPerWeek();
+        int completedDays = (progressTracker.getCurrentWeekNumber() - 1) * activeUser.getDaysPerWeek() + progressTracker.getCurrentDayNumber();
+        int progress = (int) ((completedDays / (float) totalDays) * 100);
+
+        progressBar.setProgress(progress);
+        progressTextView.setText(progress + "% completed");
+    }
+
+
 }
