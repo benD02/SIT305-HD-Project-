@@ -65,4 +65,26 @@ public class Exercise implements Parcelable{
                 ", time='" + time + '\'' +
                 '}';
     }
+
+    public String  getName() {
+        return name;
+    }
+
+
+    public String getReps() {
+        return reps;
+    }
+
+    public String getSets() {
+        return sets;
+    }
+
+    public String getWeight() {
+        return weight;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
 }

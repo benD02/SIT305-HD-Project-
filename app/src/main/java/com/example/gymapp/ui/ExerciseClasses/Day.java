@@ -59,4 +59,10 @@ public class Day implements Parcelable {
                 '}';
     }
 
+    public String getDayLabel() {
+        return dayLabel;
+    }
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
 }
