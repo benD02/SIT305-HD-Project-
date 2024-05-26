@@ -35,7 +35,13 @@ class MainActivity : AppCompatActivity() {
                         // Set the loaded data in AppData singleton
                         AppData.getInstance().activeUser = activeUser
                         AppData.getInstance().workoutPlan = workoutPlan
-                        progressTracker = loadedProgress
+                        if (loadedProgress != null) {
+                            progressTracker = loadedProgress
+                        } else {
+                            progressTracker = ProgressTracker(1, 1, activeUser?.durationInWeeks ?: 1)
+                            saveProgressToFirestore(uid, progressTracker!!)
+                        }
+
                         AppData.getInstance().progressTracker = progressTracker
 
                         // Log loaded progress
@@ -152,7 +158,12 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MainActivityLoaded", loadedProgress.toString())
 
             } else {
-                Log.d("MainActivity", "Progress document does not exist.")
+
+                if (progressTracker == null) {
+                    progressTracker = ProgressTracker(1, 1, activeUser!!.durationInWeeks)
+                    AppData.getInstance().progressTracker = progressTracker
+                }
+                Log.d("MainActivity", "Progress document does not exist. Starting from new")
                 Toast.makeText(this, "Progress data not found.", Toast.LENGTH_SHORT).show()
                 onLoaded(null)
             }
@@ -163,4 +174,17 @@ class MainActivity : AppCompatActivity() {
                 onLoaded(null)
             }
     }
+
+    private fun saveProgressToFirestore(uid: String, progressTracker: ProgressTracker) {
+        FirebaseFirestore.getInstance().collection("users").document(uid).collection("progress").document("currentProgress")
+            .set(progressTracker)
+            .addOnSuccessListener {
+                Log.d("MainActivity", "Progress saved successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("MainActivity", "Failed to save progress data", e)
+                Toast.makeText(this, "Failed to save progress data: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
 }

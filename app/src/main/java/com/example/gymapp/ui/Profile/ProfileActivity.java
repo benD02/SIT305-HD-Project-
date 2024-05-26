@@ -56,6 +56,8 @@ public class ProfileActivity extends AppCompatActivity {
             displayWorkoutPlan(workoutPlan);
         }
 
+
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
         navBar(bottomNavigationView);

@@ -71,11 +71,6 @@ public class WorkoutActivity extends AppCompatActivity {
         Log.d("loadData", progressTracker.toString());
 
 
-        if (progressTracker == null) {
-            progressTracker = new ProgressTracker(1, 1, activeUser.getDurationInWeeks());
-            AppData.getInstance().setProgressTracker(progressTracker);
-        }
-
         Log.d("WorkoutActivity", "Initial Progress: Day " + progressTracker.getCurrentDayNumber() + ", Week " + progressTracker.getCurrentWeekNumber());
         Log.d("loadData", activeUser.toString());
         Log.d("loadData", workoutPlan.toString());
@@ -228,7 +223,7 @@ public class WorkoutActivity extends AppCompatActivity {
         btnPauseSet.setVisibility(View.GONE);
 
         // Timer setup
-        final long[] timeLeft = {Long.parseLong(exercise.time) * 1000}; // Assuming time is in seconds
+        final long[] timeLeft = {Long.parseLong(exercise.time) * 1000};
         final CountDownTimer[] timer = new CountDownTimer[1];
 
         btnStartSet.setOnClickListener(v -> {

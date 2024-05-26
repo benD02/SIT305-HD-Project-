@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,18 +11,14 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.gymapp.ui.MainActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.gymapp.R;
-import com.example.gymapp.ui.Entry.EntryActivity;
 import com.example.gymapp.ui.ExerciseClasses.Day;
-import com.example.gymapp.ui.ExerciseClasses.Exercise;
 import com.example.gymapp.ui.Profile.User;
-import com.example.gymapp.ui.Workout.WorkoutActivity;
 import com.google.ai.client.generativeai.GenerativeModel;
 import com.google.ai.client.generativeai.java.GenerativeModelFutures;
 import com.google.ai.client.generativeai.type.Content;
@@ -43,7 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -76,7 +70,7 @@ public class CreatorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_creator);  // Ensure you have this layout defined
+        setContentView(R.layout.activity_creator);
         layoutContainer = findViewById(R.id.layout_container);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -91,7 +85,6 @@ public class CreatorActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> toggleDrawer());
 
         loadWorkoutDays();
-        generativeAi(daysStr, age, level, duration, goals, height, weight );
     }
 
     private void saveRoutineToFirestore() {
@@ -187,6 +180,9 @@ public class CreatorActivity extends AppCompatActivity {
                                     Log.e("CreatorActivity", "'days' field is null in document " + documentSnapshot.getId());
                                 }
 
+                                generativeAi(daysStr, age, level, goals, height, weight);
+
+
                             }
                         }
                     })
@@ -201,17 +197,29 @@ public class CreatorActivity extends AppCompatActivity {
 
     }
 
-    private void generativeAi(String daysStr, String age, String level, String duration, List goals, String height, String weight ){
+    private void generativeAi(String daysStr, String age, String level, List goals, String height, String weight ){
         GenerativeModel gm = new  GenerativeModel(/* modelName */ "gemini-pro",/* apiKey */  "AIzaSyDJxlEt0SvOaoocUIcorL-sDxaFjUXNU60");
         GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+
+        StringBuilder goalsStr = new StringBuilder();
+        if (goals != null) {
+            for (Object goal : goals) {
+                goalsStr.append(goal).append(", ");
+            }
+            if (goalsStr.length() > 2) {
+                goalsStr.setLength(goalsStr.length() - 2); // Remove the trailing comma and space
+            }
+        }
+
 
         Content content = new Content.Builder()
                 .addText( "Make a " + daysStr +  "day gym routine, for a " + age + "year old, " + level + "level, who is aged " + age +
                         ", has a height of " + height + " and a weight of" + weight + "kg,  the routine should cover the following goals:"
-                        + goals)
+                        + goals + "Do not include rest days")
                 .build();
 
-        Log.d("CreatorActivity", content.toString());
+        Log.d("contentMaker", content.toString());
 
 
         ExecutorService executor  = Executors.newSingleThreadExecutor();
@@ -309,7 +317,7 @@ public class CreatorActivity extends AppCompatActivity {
         detailsContainer.setOrientation(LinearLayout.HORIZONTAL);
         exerciseEntry.addView(detailsContainer);
 
-        // Adding detail inputs and associating them with the spinner via tag to fetch them later
+
         exerciseSpinner.setTag(new TextInputEditText[]{
                 addDetailInput(detailsContainer, "Reps"),
                 addDetailInput(detailsContainer, "Sets"),

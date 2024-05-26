@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="NAME"
-                android:textSize="50dp"
+                android:textSize="30dp"
                 android:textColor="@color/white"/>
 
             <TextView
@@ -102,17 +102,6 @@
         android:gravity="center"
         android:orientation="vertical"
         android:background="@drawable/profile_lower_section">
-
-        <Button
-            android:layout_marginLeft="100dp"
-            android:id="@+id/btnLogout"
-            android:textAlignment="textStart"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:textSize="10sp"
-            app:icon="@drawable/baseline_logout_24"/>
 
         <ScrollView
             android:layout_width="match_parent"

@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("username", username);
                         userData.put("email", email);
 
-                        //We need to save the UID locally so it can be properly referneced
+                        // save the UID locally so it can be properly referneced
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
                         // Add a new document with the user's UID
